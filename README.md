@@ -1,14 +1,14 @@
 # PlantGuard (network-innovation)
 
-PlantGuard is an innovative, lightweight Python project that combines a **neural network** with a **built-in smart care assistant** to diagnose plant stress from sensor-like readings.
+PlantGuard is an intelligent, lightweight plant and farm knowledge network that combines a **neural network** with a **built-in advisory layer** for plant stress diagnosis, plus weather context and an extensive encyclopedia.
 
-Given four inputs — soil moisture, temperature, light level, and humidity — PlantGuard predicts whether a plant is:
+Given four inputs — soil moisture, temperature, light exposure, and humidity — the model predicts:
 - **Healthy**
 - **Needs Water**
 - **Overwatered Risk**
 - **Heat/Light Stress**
 
-It then generates an explainable, AI-style care report with observations and recommended actions.
+The web interface presents clear, actionable recommendations in a professional forest-green/cloud-white design with section-based navigation.
 
 ## Why this is innovative
 Most simple plant reminders use fixed thresholds only. PlantGuard adds a learned layer:
@@ -22,13 +22,18 @@ Most simple plant reminders use fixed thresholds only. PlantGuard adds a learned
 ## Project structure
 ```text
 .
-├── main.py
+├── index.html          # Web app UI (sections/navigation)
+├── styles.css          # Forest-green/cloud-white theme
+├── app.js              # Browser NN inference, diagnosis, weather, encyclopedia UI
+├── knowledge.js        # Knowledge network dataset (60+ plants, weeds, special species)
+├── model_weights.json  # Trained neural network weights for browser inference
+├── main.py             # CLI entrypoint
 ├── plantguard/
 │   ├── __init__.py
-│   ├── assistant.py   # built-in smart care assistant
-│   ├── cli.py         # command-line interface
-│   ├── data.py        # synthetic data generation & preprocessing
-│   └── model.py       # neural network (from scratch)
+│   ├── assistant.py    # built-in smart care assistant
+│   ├── cli.py          # command-line interface
+│   ├── data.py         # synthetic data generation & preprocessing
+│   └── model.py        # neural network (from scratch)
 └── tests/
     └── test_plantguard.py
 ```
@@ -38,13 +43,14 @@ Most simple plant reminders use fixed thresholds only. PlantGuard adds a learned
 - No third-party packages required
 
 ## Web app (browser)
-Open `index.html` locally or deploy the repo as a static site (e.g. on Vercel). The browser app loads `model_weights.json` and runs the neural network + built-in care assistant client-side.
+Open `index.html` locally or deploy the repo as a static site (e.g. on Vercel). The browser app loads `model_weights.json` and runs neural inference client-side (no backend required).
 
-**Sections (W3Schools-style sidebar layout):**
-- **Home / Check Plant:** Visual, farmer-friendly plant health check using the neural network. Big icons and simple color-coded results (OK / Needs Water / Too Much Water / Heat or Sun Problem) with a **Listen** option (text-to-speech) for spoken advice.
-- **Weather:** Uses your location (browser geolocation) and [Open-Meteo](https://open-meteo.com/) (no API key) to show current weather and simple farm advice.
-- **Plant Book (Encyclopedia):** Common crops/plants with lifespan/span, water/sun needs, weaknesses/problems, and care tips, with search.
-- **Help:** Simple step-by-step instructions.
+**Sections (W3Schools-style sidebar navigation):**
+- **Home:** Overview of the diagnosis, weather, and knowledge network modules.
+- **Plant Diagnosis:** Neural assessment from soil moisture, temperature, light, and humidity with confidence and prioritized recommendations (optional spoken summary via browser speech synthesis).
+- **Weather Insights:** Location-based current conditions using [Open-Meteo](https://open-meteo.com/) (no API key) with practical operational guidance.
+- **Encyclopedia (Knowledge Network):** 60+ structured entries spanning crops, vegetables, fruits, legumes, tubers, trees/special plants, and **weeds**. Includes lifespan/cycle, conditions, vulnerabilities/weaknesses, management/control, impact/use, and notes — with category filters and search for efficient exploration.
+- **Guide:** Usage and accessibility notes.
 
 ## Usage
 

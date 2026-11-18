@@ -1,12 +1,6 @@
-/* ========== Neural network (same logic, runs in browser) ========== */
+/* ========== Neural network (browser inference) ========== */
 const FEATURE_NAMES = ["soil_moisture", "temperature_c", "light_level", "humidity"];
 const LABELS = ["Healthy", "Needs Water", "Overwatered Risk", "Heat/Light Stress"];
-const HEALTHY_RANGES = {
-  soil_moisture: [35, 65],
-  temperature_c: [18, 29],
-  light_level: [35, 75],
-  humidity: [35, 70],
-};
 const BOUNDS = [[0, 100], [5, 45], [0, 100], [10, 100]];
 let model = null;
 let lastSpeakText = "";
@@ -31,38 +25,27 @@ function predictProba(featuresNorm) {
   return softmax(z2);
 }
 
-/* ========== Simple, farmer-friendly diagnosis ========== */
-const SIMPLE_STATUS = {
-  "Healthy": { icon: "✅", cls: "r-ok", title: "Plant is OK", short: "Your plant looks fine." },
-  "Needs Water": { icon: "💧", cls: "r-water", title: "Needs Water", short: "Your plant needs water." },
-  "Overwatered Risk": { icon: "⚠️", cls: "r-wet", title: "Too Much Water", short: "Soil has too much water." },
-  "Heat/Light Stress": { icon: "☀️", cls: "r-stress", title: "Heat or Sun Problem", short: "Too hot, cold, or too much/too little sun." },
-};
-
-function simpleTips(label, readings) {
-  const tips = [];
-  const { soil_moisture: soil, temperature_c: temp, light_level: light, humidity: hum } = readings;
-  if (label === "Needs Water") {
-    tips.push({ ico: "💧", text: "Give water slowly to the soil." });
-    tips.push({ ico: "⏳", text: "Check soil again after some hours." });
-    if (hum < 35) tips.push({ ico: "💨", text: "Air is dry. Light mist can help." });
-  } else if (label === "Overwatered Risk") {
-    tips.push({ ico: "🛑", text: "Stop watering for now." });
-    tips.push({ ico: "🕳️", text: "Make sure water can flow out of soil/pot." });
-    if (light < 35) tips.push({ ico: "☀️", text: "More light can help soil dry." });
-  } else if (label === "Heat/Light Stress") {
-    if (temp > 29) tips.push({ ico: "🌳", text: "Move plant to a cooler or shaded place." });
-    if (temp < 18) tips.push({ ico: "🧣", text: "Protect plant from cold wind." });
-    if (light > 75) tips.push({ ico: "⛱️", text: "Too much sun. Give some shade." });
-    if (light < 35) tips.push({ ico: "☀️", text: "Plant needs more light." });
-    if (hum < 35) tips.push({ ico: "💨", text: "Air is dry. Add a little moisture around plant." });
-    if (!tips.length) tips.push({ ico: "🌿", text: "Keep heat and sun balanced." });
-  } else {
-    tips.push({ ico: "👍", text: "Keep doing the same care." });
-    tips.push({ ico: "👀", text: "Watch plant every day for changes." });
+async function loadModel() {
+  const status = document.getElementById("model-status");
+  try {
+    const res = await fetch("./model_weights.json", { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    model = await res.json();
+    status.textContent = "Model loaded and ready.";
+    status.classList.remove("error");
+  } catch (err) {
+    status.textContent = `Unable to load model weights (${err.message}). Ensure model_weights.json is available.`;
+    status.classList.add("error");
   }
-  return tips;
 }
+
+/* ========== Diagnosis ========== */
+const STATUS_META = {
+  "Healthy": { cls: "r-ok", title: "Healthy", summary: "Conditions are within a generally favorable range." },
+  "Needs Water": { cls: "r-water", title: "Needs Water", summary: "Moisture levels indicate likely water deficit." },
+  "Overwatered Risk": { cls: "r-wet", title: "Overwatered Risk", summary: "Moisture levels indicate potential excess water or poor drainage risk." },
+  "Heat/Light Stress": { cls: "r-stress", title: "Heat/Light Stress", summary: "Temperature, light, or humidity conditions indicate environmental stress." },
+};
 
 function getReadings() {
   return {
@@ -73,160 +56,207 @@ function getReadings() {
   };
 }
 
+function recommendations(label, r) {
+  const tips = [];
+  if (label === "Needs Water") {
+    tips.push("Irrigate gradually and allow water to penetrate the root zone without runoff.");
+    tips.push("Recheck soil moisture after irrigation before repeating.");
+    if (r.humidity < 35) tips.push("Low ambient humidity may increase evapotranspiration; monitor moisture more frequently.");
+    if (r.temperature_c > 30) tips.push("High temperatures can accelerate drying; consider early-morning or evening watering.");
+  } else if (label === "Overwatered Risk") {
+    tips.push("Pause irrigation and allow the substrate/soil to drain and partially dry.");
+    tips.push("Verify drainage pathways and avoid standing water around roots.");
+    if (r.light_level < 35) tips.push("Low light can slow drying; improve light exposure where appropriate.");
+  } else if (label === "Heat/Light Stress") {
+    if (r.temperature_c > 29) tips.push("Reduce heat exposure (shade, ventilation, or timing adjustments) during peak temperatures.");
+    if (r.temperature_c < 18) tips.push("Protect plants from cold stress, drafts, or low nighttime temperatures.");
+    if (r.light_level > 75) tips.push("Excessive light intensity may require shading or diffusion.");
+    if (r.light_level < 35) tips.push("Insufficient light may limit growth; increase exposure gradually where feasible.");
+    if (r.humidity < 35) tips.push("Low humidity can exacerbate stress; consider humidity management where practical.");
+    if (!tips.length) tips.push("Stabilize temperature, light, and humidity to reduce environmental stress.");
+  } else {
+    tips.push("Maintain current management practices and continue routine monitoring.");
+    tips.push("Adjust inputs incrementally if any parameter trends outside the optimal range.");
+  }
+  return tips;
+}
+
 function diagnose() {
   if (!model) return;
-  const readings = getReadings();
-  const probs = predictProba(normalizeFeatures(FEATURE_NAMES.map((n) => readings[n])));
+  const r = getReadings();
+  const probs = predictProba(normalizeFeatures(FEATURE_NAMES.map((n) => r[n])));
   const idx = probs.indexOf(Math.max(...probs));
   const label = LABELS[idx];
-  const info = SIMPLE_STATUS[label];
-  const tips = simpleTips(label, readings);
+  const confidence = probs[idx];
+  const meta = STATUS_META[label];
+  const tips = recommendations(label, r);
 
-  lastSpeakText = info.short + " " + tips.map((t) => t.text).join(" ");
+  lastSpeakText = `${meta.title}. ${meta.summary} Recommendations: ${tips.join(" ")}`;
 
   document.getElementById("result-box").innerHTML = `
-    <div class="result-main ${info.cls}">
-      <div class="big-status">${info.icon}</div>
-      <h3>${info.title}</h3>
-      <p>${info.short}</p>
+    <div class="result-head ${meta.cls}">
+      <h3>${meta.title}</h3>
+      <p>${meta.summary}</p>
+      <p class="subtle">Model confidence: ${(confidence * 100).toFixed(1)}%</p>
     </div>
-    <ul class="advice-list">${tips.map((t) => `<li><span class="li-ico">${t.ico}</span><span>${t.text}</span></li>`).join("")}</ul>
-    <div class="mini-readings">
-      <div class="mini">💧 Water <strong>${readings.soil_moisture.toFixed(0)}</strong></div>
-      <div class="mini">🌡️ Heat <strong>${readings.temperature_c.toFixed(1)}°C</strong></div>
-      <div class="mini">☀️ Sun <strong>${readings.light_level.toFixed(0)}</strong></div>
-      <div class="mini">💨 Air <strong>${readings.humidity.toFixed(0)}</strong></div>
-    </div>`;
-  document.getElementById("listen-btn").style.display = "inline-block";
+    <div class="metrics">
+      <div class="metric"><div class="label">Soil moisture</div><div class="value">${r.soil_moisture.toFixed(0)}%</div></div>
+      <div class="metric"><div class="label">Temperature</div><div class="value">${r.temperature_c.toFixed(1)}°C</div></div>
+      <div class="metric"><div class="label">Light exposure</div><div class="value">${r.light_level.toFixed(0)}%</div></div>
+      <div class="metric"><div class="label">Humidity</div><div class="value">${r.humidity.toFixed(0)}%</div></div>
+    </div>
+    <h3>Recommendations</h3>
+    <ul class="rec-list">${tips.map((t) => `<li>${t}</li>`).join("")}</ul>
+    <p class="subtle">Inference runs locally in your browser using a trained feedforward neural network (4→12→4). Use as decision support alongside field observation.</p>
+  `;
+  const listenBtn = document.getElementById("listen-btn");
+  listenBtn.style.display = "inline-flex";
 }
 
 function speakResult() {
   if (!lastSpeakText) return;
-  if (!("speechSynthesis" in window)) { alert("Listen is not supported on this device/browser."); return; }
+  if (!("speechSynthesis" in window)) { alert("Speech synthesis is not supported in this browser."); return; }
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(lastSpeakText);
-  u.rate = 0.9;
+  u.rate = 0.95;
   window.speechSynthesis.speak(u);
 }
 
-async function loadModel() {
-  const status = document.getElementById("model-status");
-  try {
-    const res = await fetch("./model_weights.json", { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    model = await res.json();
-    status.textContent = "Ready ✅";
-    status.classList.remove("error");
-  } catch (err) {
-    status.textContent = `Problem loading plant brain (${err.message}).`;
-    status.classList.add("error");
-  }
-}
-
-/* ========== Weather (Open-Meteo, no API key) ========== */
+/* ========== Weather (Open-Meteo) ========== */
 function weatherCodeInfo(code) {
   const map = [
-    [[0], "☀️", "Clear sky"],
-    [[1, 2], "🌤️", "Partly cloudy"],
-    [[3], "☁️", "Cloudy"],
-    [[45, 48], "🌫️", "Fog"],
-    [[51, 53, 55, 56, 57], "🌦️", "Light rain/drizzle"],
-    [[61, 63, 65, 66, 67], "🌧️", "Rain"],
-    [[71, 73, 75, 77], "🌨️", "Snow"],
-    [[80, 81, 82], "🌧️", "Rain showers"],
-    [[95, 96, 99], "⛈️", "Thunderstorm"],
+    [[0], "Clear sky"],
+    [[1], "Mainly clear"], [[2], "Partly cloudy"], [[3], "Overcast"],
+    [[45, 48], "Fog / rime fog"],
+    [[51, 53, 55], "Drizzle"], [[56, 57], "Freezing drizzle"],
+    [[61, 63, 65], "Rain"], [[66, 67], "Freezing rain"],
+    [[71, 73, 75], "Snowfall"], [[77], "Snow grains"],
+    [[80, 81, 82], "Rain showers"], [[85, 86], "Snow showers"],
+    [[95], "Thunderstorm"], [[96, 99], "Thunderstorm with hail"],
   ];
-  for (const [codes, icon, desc] of map) if (codes.includes(code)) return { icon, desc };
-  return { icon: "🌤️", desc: "Weather" };
+  for (const [codes, desc] of map) if (codes.includes(code)) return desc;
+  return "Variable conditions";
 }
 
 function weatherAdvice(cur) {
   const tips = [];
   const t = cur.temperature_2m, h = cur.relative_humidity_2m, r = cur.precipitation, w = cur.wind_speed_10m;
-  if (r > 0.5) tips.push({ ico: "🌧️", text: "Rain expected/now. Do not add too much water." });
-  else if (t > 32) tips.push({ ico: "💧", text: "Very hot. Plants may need more water (early morning/evening)." });
-  else if (t < 15) tips.push({ ico: "🧣", text: "Cool weather. Protect young plants from cold." });
-  else tips.push({ ico: "👍", text: "Weather is okay for normal farm work." });
-  if (w > 35) tips.push({ ico: "💨", text: "Strong wind. Support weak plants." });
-  if (h < 30) tips.push({ ico: "💨", text: "Air is dry. Plants may lose water faster." });
-  if (h > 85) tips.push({ ico: "🍄", text: "Very humid. Watch for plant disease." });
+  if (r >= 1) tips.push("Precipitation detected: defer or reduce irrigation and assess drainage to prevent waterlogging.");
+  else if (r > 0) tips.push("Light precipitation: account for added moisture before irrigating.");
+  if (t >= 33) tips.push("High temperature: increase monitoring for moisture stress; irrigate during cooler periods where possible.");
+  if (t <= 12) tips.push("Low temperature: protect sensitive crops and delay temperature-sensitive operations as appropriate.");
+  if (w >= 35) tips.push("Elevated wind speeds: secure structures/supports and consider wind protection for vulnerable plants.");
+  if (h <= 30) tips.push("Low humidity: higher evapotranspiration likely; adjust irrigation and mulching strategies.");
+  if (h >= 85) tips.push("High humidity: increased disease pressure possible; prioritize airflow and monitoring for fungal/bacterial issues.");
+  if (!tips.length) tips.push("Conditions appear moderate; proceed with standard field operations and routine monitoring.");
   return tips;
 }
 
 async function checkWeather() {
   const status = document.getElementById("weather-status");
   const out = document.getElementById("weather-result");
-  if (!navigator.geolocation) { status.textContent = "Location not supported on this device."; status.classList.add("error"); return; }
-  status.textContent = "Getting your location…"; status.classList.remove("error"); out.innerHTML = "";
+  if (!navigator.geolocation) { status.textContent = "Geolocation is not supported by this browser."; status.classList.add("error"); return; }
+  status.textContent = "Requesting location…"; status.classList.remove("error"); out.innerHTML = "";
+
   navigator.geolocation.getCurrentPosition(async (pos) => {
     try {
-      status.textContent = "Getting weather…";
+      status.textContent = "Fetching current conditions…";
       const { latitude: lat, longitude: lon } = pos.coords;
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&timezone=auto`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       const cur = data.current;
-      const info = weatherCodeInfo(cur.weather_code);
+      const desc = weatherCodeInfo(cur.weather_code);
       const tips = weatherAdvice(cur);
-      status.textContent = "Weather loaded ✅";
+      status.textContent = `Location: ${lat.toFixed(3)}, ${lon.toFixed(3)} • Timezone: ${data.timezone || "local"}`;
       out.innerHTML = `
-        <div class="weather-card">
-          <div class="weather-now">
-            <div class="weather-icon">${info.icon}</div>
+        <div class="weather-wrap">
+          <div class="weather-summary">
             <div>
-              <div class="weather-temp">${cur.temperature_2m}°C</div>
-              <div class="weather-desc">${info.desc}</div>
+              <div class="weather-big">${cur.temperature_2m}°C</div>
+              <div class="weather-desc">${desc}</div>
             </div>
           </div>
-          <div class="weather-grid">
-            <div class="wbox"><div class="wico">💧</div><div class="wval">${cur.relative_humidity_2m}%</div><div class="wlab">Air water</div></div>
-            <div class="wbox"><div class="wico">🌧️</div><div class="wval">${cur.precipitation} mm</div><div class="wlab">Rain</div></div>
-            <div class="wbox"><div class="wico">💨</div><div class="wval">${cur.wind_speed_10m} km/h</div><div class="wlab">Wind</div></div>
+          <div class="weather-metrics">
+            <div class="metric"><div class="label">Humidity</div><div class="value">${cur.relative_humidity_2m}%</div></div>
+            <div class="metric"><div class="label">Precipitation</div><div class="value">${cur.precipitation} mm</div></div>
+            <div class="metric"><div class="label">Wind speed</div><div class="value">${cur.wind_speed_10m} km/h</div></div>
           </div>
-          <div class="advice-box">
-            <h3>🌱 Farm advice</h3>
-            <ul class="advice-list">${tips.map((t) => `<li><span class="li-ico">${t.ico}</span><span>${t.text}</span></li>`).join("")}</ul>
+          <div class="advice-panel">
+            <h3>Operational guidance</h3>
+            <ul class="rec-list">${tips.map((t) => `<li>${t}</li>`).join("")}</ul>
           </div>
         </div>`;
     } catch (err) {
-      status.textContent = `Could not get weather (${err.message}).`; status.classList.add("error");
+      status.textContent = `Unable to retrieve weather (${err.message}).`;
+      status.classList.add("error");
     }
-  }, (err) => {
-    status.textContent = "Location not allowed. Please allow location to check weather."; status.classList.add("error");
+  }, () => {
+    status.textContent = "Location access denied or unavailable. Enable location permissions to use this feature.";
+    status.classList.add("error");
   });
 }
 
-/* ========== Plant Encyclopedia ========== */
-const PLANTS = [
-  { emoji: "🌽", name: "Maize (Corn)", lifespan: "3–5 months (one season)", water: "Medium", sun: "Full sun", weaknesses: ["Fall armyworm", "Stem borer", "Maize streak virus", "Drought at flowering"], care: "Plant in well-drained soil. Weed early. Add fertilizer when young." },
-  { emoji: "🌾", name: "Rice", lifespan: "3–6 months", water: "High (needs much water)", sun: "Full sun", weaknesses: ["Rice blast disease", "Stem borer", "Brown planthopper", "Flooding or drought"], care: "Keep water level steady in paddy. Use healthy seedlings." },
-  { emoji: "🌿", name: "Cassava", lifespan: "9–18 months to harvest", water: "Low to medium", sun: "Full sun", weaknesses: ["Cassava mosaic disease", "Mealybugs", "Root rot in wet soil", "Poor soil"], care: "Plant stem cuttings in loose soil. Avoid waterlogged land." },
-  { emoji: "🍅", name: "Tomato", lifespan: "3–6 months", water: "Medium (regular)", sun: "Full sun", weaknesses: ["Blight", "Wilt", "Aphids/whiteflies", "Fruit cracking"], care: "Stake plants. Water soil, not leaves. Remove diseased leaves." },
-  { emoji: "🍠", name: "Yam", lifespan: "6–10 months", water: "Medium", sun: "Full sun", weaknesses: ["Yam beetle", "Nematodes", "Tuber rot", "Anthracnose"], care: "Plant in mounds/ridges with good drainage. Use healthy seed yams." },
-  { emoji: "🫘", name: "Beans", lifespan: "2–4 months", water: "Medium", sun: "Full sun", weaknesses: ["Aphids", "Bean rust", "Root rot", "Too much rain"], care: "Do not overwater. Rotate crops to keep soil healthy." },
-  { emoji: "🌶️", name: "Pepper", lifespan: "4–6 months (can fruit longer)", water: "Medium", sun: "Full sun", weaknesses: ["Leaf curl virus", "Aphids/thrips", "Fruit rot", "Drought stress"], care: "Water regularly but avoid soggy soil. Harvest ripe fruits often." },
-  { emoji: "🍌", name: "Plantain/Banana", lifespan: "9–12 months to fruit (plant lives several years by suckers)", water: "High", sun: "Full sun to partial shade", weaknesses: ["Black sigatoka", "Nematodes", "Banana weevil", "Strong wind damage"], care: "Needs rich soil and regular water. Remove old leaves and excess suckers." },
-  { emoji: "🥬", name: "Okra", lifespan: "2–4 months", water: "Medium", sun: "Full sun", weaknesses: ["Flea beetles", "Aphids", "Powdery mildew", "Poor flowering in cold"], care: "Harvest pods young. Keep soil moist but not waterlogged." },
-  { emoji: "🥜", name: "Groundnut (Peanut)", lifespan: "3–5 months", water: "Low to medium", sun: "Full sun", weaknesses: ["Leaf spot", "Rosette virus", "Aphids", "Drought at pegging"], care: "Grow in loose, sandy soil. Avoid too much nitrogen fertilizer." },
-  { emoji: "🥔", name: "Potato", lifespan: "3–4 months", water: "Medium (regular)", sun: "Full sun", weaknesses: ["Late blight", "Potato beetle", "Tuber rot", "Waterlogging"], care: "Hill soil around stems. Keep moisture even, avoid wet leaves." },
-  { emoji: "🥭", name: "Mango (tree)", lifespan: "Many years (can bear 30+ years)", water: "Low to medium once grown", sun: "Full sun", weaknesses: ["Anthracnose", "Fruit flies", "Powdery mildew", "Frost/cold damage"], care: "Prune lightly. Protect flowers/fruit from disease and pests." },
-];
+/* ========== Knowledge Network (encyclopedia) ========== */
+let activeCategory = "All";
+let searchQuery = "";
 
-function renderPlants(filter = "") {
-  const q = filter.trim().toLowerCase();
-  const list = PLANTS.filter((p) => p.name.toLowerCase().includes(q) || p.weaknesses.join(" ").toLowerCase().includes(q));
+function getCategories() {
+  const set = new Set((KNOWLEDGE_BASE || []).map((e) => e.category));
+  return ["All", ...Array.from(set)];
+}
+
+function entryText(e) {
+  return [e.name, e.scientificName, e.category, e.lifespan, e.conditions, (e.vulnerabilities||[]).join(" "), e.management, e.impact, e.notes].join(" ").toLowerCase();
+}
+
+function renderFilters() {
+  const cats = getCategories();
+  const wrap = document.getElementById("category-filters");
+  wrap.innerHTML = cats.map((c) => `<button class="filter-btn ${c===activeCategory?"active":""}" data-cat="${c}">${c}</button>`).join("");
+  wrap.querySelectorAll(".filter-btn").forEach((btn) => btn.addEventListener("click", () => {
+    activeCategory = btn.dataset.cat;
+    renderFilters();
+    renderKnowledge();
+  }));
+}
+
+function typeClass(cat) { return (cat || "").replace(/[^a-zA-Z]/g, "-"); }
+
+function renderKnowledge() {
+  const q = searchQuery.trim().toLowerCase();
+  let list = (KNOWLEDGE_BASE || []).filter((e) => activeCategory === "All" || e.category === activeCategory);
+  if (q) list = list.filter((e) => entryText(e).includes(q));
+
+  document.getElementById("result-count").textContent = `${list.length} entr${list.length === 1 ? "y" : "ies"} shown (${(KNOWLEDGE_BASE||[]).length} total in network)`;
+
   const el = document.getElementById("plant-list");
-  if (!list.length) { el.innerHTML = `<p class="status">No plant found.</p>`; return; }
-  el.innerHTML = list.map((p) => `
-    <article class="plant-card">
-      <div class="plant-head"><div class="plant-emoji">${p.emoji}</div><h3>${p.name}</h3></div>
-      <div class="plant-meta">
-        <div class="meta-row"><strong>⏳ Life/span:</strong> ${p.lifespan}</div>
-        <div class="meta-row"><strong>💧 Water need:</strong> ${p.water}</div>
-        <div class="meta-row"><strong>☀️ Sun need:</strong> ${p.sun}</div>
-        <div class="meta-row"><strong>⚠️ Weakness/problems:</strong><br>${p.weaknesses.map((w) => `<span class="pill">${w}</span>`).join("")}</div>
-        <div class="meta-row"><strong>🌱 Care:</strong> ${p.care}</div>
+  if (!list.length) { el.innerHTML = `<div class="card"><p class="status">No entries match the current filters.</p></div>`; return; }
+
+  el.innerHTML = list.map((e) => `
+    <article class="k-card">
+      <div class="k-head">
+        <div>
+          <h3 class="k-title">${e.name}</h3>
+          <p class="k-sci">${e.scientificName || ""}</p>
+        </div>
+        <span class="k-type ${typeClass(e.category)}">${e.category}</span>
+      </div>
+      <div class="k-body">
+        <div class="k-row"><strong>Lifespan / cycle:</strong> ${e.lifespan || "—"}</div>
+        <div class="k-row"><strong>Conditions:</strong> ${e.conditions || "—"}</div>
+        <div class="k-row"><strong>Vulnerabilities / weaknesses:</strong>
+          <div class="tags">${(e.vulnerabilities||[]).map((v)=>`<span class="tag">${v}</span>`).join("") || "—"}</div>
+        </div>
+        <details class="k-more">
+          <summary>Management, impact, and notes</summary>
+          <div class="k-body" style="margin-top:8px">
+            <div class="k-row"><strong>Management / control:</strong> ${e.management || "—"}</div>
+            <div class="k-row"><strong>Impact / use:</strong> ${e.impact || "—"}</div>
+            <div class="k-row"><strong>Notes:</strong> ${e.notes || "—"}</div>
+          </div>
+        </details>
       </div>
     </article>`).join("");
 }
@@ -241,30 +271,24 @@ function showSection(id) {
 }
 
 function setup() {
-  // Nav
   document.querySelectorAll(".nav-link").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); showSection(a.dataset.section); }));
   document.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => showSection(b.dataset.go)));
   document.getElementById("menu-btn").addEventListener("click", () => document.getElementById("sidebar").classList.toggle("open"));
 
-  // Sliders
   for (const name of FEATURE_NAMES) {
     const input = document.getElementById(name);
     const out = document.getElementById(`${name}_val`);
     input.addEventListener("input", () => { out.textContent = input.value; });
   }
 
-  // Diagnose
   document.getElementById("diagnose-btn").addEventListener("click", diagnose);
   document.getElementById("listen-btn").addEventListener("click", speakResult);
-
-  // Weather
   document.getElementById("weather-btn").addEventListener("click", checkWeather);
 
-  // Encyclopedia
-  renderPlants();
-  document.getElementById("plant-search").addEventListener("input", (e) => renderPlants(e.target.value));
+  renderFilters();
+  renderKnowledge();
+  document.getElementById("plant-search").addEventListener("input", (e) => { searchQuery = e.target.value; renderKnowledge(); });
 
-  // Initial section from hash
   const hash = (location.hash || "#home").replace("#", "");
   if (document.getElementById(hash)) showSection(hash);
 }

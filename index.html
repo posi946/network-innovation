@@ -3,133 +3,165 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PlantGuard — Simple Plant Helper</title>
+  <title>PlantGuard — Intelligent Plant & Farm Knowledge Network</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="topbar">
     <button id="menu-btn" class="menu-btn" aria-label="Open menu">☰</button>
-    <div class="brand"><span class="brand-icon">🌱</span> PlantGuard <span class="brand-sub">Plant Helper</span></div>
+    <div class="brand">
+      <span class="brand-mark">PG</span>
+      <span class="brand-text">PlantGuard <span class="brand-sub">Knowledge Network</span></span>
+    </div>
   </header>
 
   <div class="layout">
     <nav id="sidebar" class="sidebar" aria-label="Sections">
-      <div class="sidebar-title">Menu</div>
-      <a href="#home" class="nav-link active" data-section="home"><span class="nav-ico">🏠</span><span>Home</span></a>
-      <a href="#check" class="nav-link" data-section="check"><span class="nav-ico">🩺</span><span>Check Plant</span></a>
-      <a href="#weather" class="nav-link" data-section="weather"><span class="nav-ico">🌦️</span><span>Weather</span></a>
-      <a href="#encyclopedia" class="nav-link" data-section="encyclopedia"><span class="nav-ico">📚</span><span>Plant Book</span></a>
-      <a href="#help" class="nav-link" data-section="help"><span class="nav-ico">❓</span><span>Help</span></a>
+      <div class="sidebar-title">Navigation</div>
+      <a href="#home" class="nav-link active" data-section="home">Home</a>
+      <a href="#diagnosis" class="nav-link" data-section="diagnosis">Plant Diagnosis</a>
+      <a href="#weather" class="nav-link" data-section="weather">Weather Insights</a>
+      <a href="#encyclopedia" class="nav-link" data-section="encyclopedia">Encyclopedia</a>
+      <a href="#help" class="nav-link" data-section="help">Guide</a>
+      <div class="sidebar-note">Forest-green intelligence for crops, weeds, and special plants.</div>
     </nav>
 
     <main class="content">
       <!-- HOME -->
       <section id="home" class="section active">
-        <div class="hero-card">
-          <div class="hero-big">🌱 PlantGuard</div>
-          <p class="hero-text">Simple help for your plants.</p>
-          <div class="big-actions">
-            <button class="big-btn green" data-go="check"><span class="big-ico">🩺</span><span>Check Plant</span></button>
-            <button class="big-btn blue" data-go="weather"><span class="big-ico">🌦️</span><span>Check Weather</span></button>
-            <button class="big-btn yellow" data-go="encyclopedia"><span class="big-ico">📚</span><span>Plant Book</span></button>
+        <div class="hero">
+          <p class="eyebrow">Neural diagnosis • Weather context • Knowledge network</p>
+          <h1>PlantGuard Knowledge Network</h1>
+          <p class="lead">An adult-focused, practical platform combining a browser-based neural network, local weather insights, and an extensive encyclopedia of plants, weeds, and special species.</p>
+          <div class="hero-actions">
+            <button class="btn primary" data-go="diagnosis">Open Diagnosis</button>
+            <button class="btn secondary" data-go="encyclopedia">Browse Encyclopedia</button>
+            <button class="btn secondary" data-go="weather">Check Weather</button>
           </div>
         </div>
-        <div class="info-grid">
-          <div class="info-card">
-            <div class="info-ico">💧</div>
-            <h3>Water</h3>
-            <p>Too little or too much water can harm plants.</p>
-          </div>
-          <div class="info-card">
-            <div class="info-ico">☀️</div>
-            <h3>Sun & Heat</h3>
-            <p>Plants need the right sun and temperature.</p>
-          </div>
-          <div class="info-card">
-            <div class="info-ico">📖</div>
-            <h3>Learn</h3>
-            <p>See plant life, weakness, and care in Plant Book.</p>
-          </div>
+
+        <div class="card-grid three">
+          <article class="card">
+            <h3>Neural Plant Diagnosis</h3>
+            <p>Evaluate soil moisture, temperature, light, and humidity with a lightweight neural model and receive clear, actionable recommendations.</p>
+          </article>
+          <article class="card">
+            <h3>Weather-Aware Decisions</h3>
+            <p>Use location-based current conditions (via Open-Meteo) to inform irrigation, protection, and field planning.</p>
+          </article>
+          <article class="card">
+            <h3>Encyclopedia & Weeds</h3>
+            <p>Explore 60+ entries covering crops, vegetables, fruits, legumes, tubers, trees/special plants, and weeds — including lifespan, vulnerabilities, and management.</p>
+          </article>
         </div>
       </section>
 
-      <!-- CHECK PLANT -->
-      <section id="check" class="section">
-        <h1 class="page-title"><span>🩺</span> Check Plant</h1>
-        <p class="simple-lead">Move the bars to match your plant. Then press the big green button.</p>
+      <!-- DIAGNOSIS -->
+      <section id="diagnosis" class="section">
+        <div class="section-head">
+          <h1>Plant Diagnosis</h1>
+          <p class="lead">Adjust field or plant conditions and run the neural assessment. Results are designed to be clear, practical, and efficient.</p>
+        </div>
 
-        <div class="panel-grid">
-          <div class="panel">
-            <h2 class="panel-title">Plant readings</h2>
-            <div class="field-card">
-              <div class="field-label"><span class="ico">💧</span><span>Water in soil</span><output id="soil_moisture_val" class="val">55</output></div>
+        <div class="split">
+          <div class="card">
+            <h2>Input conditions</h2>
+            <div class="field">
+              <div class="field-top"><label for="soil_moisture">Soil moisture</label><span><output id="soil_moisture_val">55</output>%</span></div>
               <input id="soil_moisture" type="range" min="0" max="100" step="1" value="55" />
-              <div class="scale"><span>Dry</span><span>Wet</span></div>
+              <div class="scale"><span>Dry</span><span>Saturated</span></div>
             </div>
-            <div class="field-card">
-              <div class="field-label"><span class="ico">🌡️</span><span>Hot or cold</span><output id="temperature_c_val" class="val">24</output><span class="small-unit">°C</span></div>
+            <div class="field">
+              <div class="field-top"><label for="temperature_c">Temperature</label><span><output id="temperature_c_val">24</output>°C</span></div>
               <input id="temperature_c" type="range" min="5" max="45" step="0.5" value="24" />
-              <div class="scale"><span>Cold</span><span>Hot</span></div>
+              <div class="scale"><span>Cool</span><span>Hot</span></div>
             </div>
-            <div class="field-card">
-              <div class="field-label"><span class="ico">☀️</span><span>Sun light</span><output id="light_level_val" class="val">60</output></div>
+            <div class="field">
+              <div class="field-top"><label for="light_level">Light exposure</label><span><output id="light_level_val">60</output>%</span></div>
               <input id="light_level" type="range" min="0" max="100" step="1" value="60" />
-              <div class="scale"><span>Dark</span><span>Bright</span></div>
+              <div class="scale"><span>Low</span><span>High</span></div>
             </div>
-            <div class="field-card">
-              <div class="field-label"><span class="ico">💨</span><span>Air water (humidity)</span><output id="humidity_val" class="val">50</output></div>
+            <div class="field">
+              <div class="field-top"><label for="humidity">Relative humidity</label><span><output id="humidity_val">50</output>%</span></div>
               <input id="humidity" type="range" min="10" max="100" step="1" value="50" />
-              <div class="scale"><span>Dry air</span><span>Wet air</span></div>
+              <div class="scale"><span>Dry air</span><span>Humid air</span></div>
             </div>
-            <button id="diagnose-btn" class="action-btn green big-wide">✅ Check Plant Now</button>
-            <p id="model-status" class="status">Loading plant brain…</p>
+            <div class="actions-row">
+              <button id="diagnose-btn" class="btn primary">Run diagnosis</button>
+              <button id="listen-btn" class="btn secondary" style="display:none;">Listen to summary</button>
+            </div>
+            <p id="model-status" class="status">Loading model…</p>
           </div>
 
-          <div class="panel">
-            <h2 class="panel-title">Result</h2>
-            <div id="result-box" class="result-empty">
-              <div class="result-icon">🌿</div>
-              <p>Press <strong>Check Plant Now</strong> to see result.</p>
-            </div>
-            <button id="listen-btn" class="action-btn blue" style="display:none;">🔊 Listen</button>
+          <div class="card">
+            <h2>Assessment</h2>
+            <div id="result-box" class="empty-state">Set conditions and run the diagnosis to view status, confidence, and recommendations.</div>
           </div>
         </div>
       </section>
 
       <!-- WEATHER -->
       <section id="weather" class="section">
-        <h1 class="page-title"><span>🌦️</span> Weather</h1>
-        <p class="simple-lead">Check weather for your farm area.</p>
-        <div class="panel">
-          <button id="weather-btn" class="action-btn green big-wide">📍 Use My Location for Weather</button>
-          <p id="weather-status" class="status">Press the button to check weather.</p>
-          <div id="weather-result" class="weather-result"></div>
+        <div class="section-head">
+          <h1>Weather Insights</h1>
+          <p class="lead">Retrieve current local conditions to support timely farm decisions. Powered by Open-Meteo (no API key required).</p>
+        </div>
+        <div class="card">
+          <div class="actions-row">
+            <button id="weather-btn" class="btn primary">Use my location</button>
+          </div>
+          <p id="weather-status" class="status">Location permission is required to fetch local weather.</p>
+          <div id="weather-result"></div>
         </div>
       </section>
 
       <!-- ENCYCLOPEDIA -->
       <section id="encyclopedia" class="section">
-        <h1 class="page-title"><span>📚</span> Plant Book</h1>
-        <p class="simple-lead">Learn about plants: how long they live, their weakness, and care.</p>
-        <input id="plant-search" class="search" type="text" placeholder="Search plant name…" aria-label="Search plant" />
-        <div id="plant-list" class="plant-grid"></div>
+        <div class="section-head">
+          <h1>Plant & Weed Encyclopedia</h1>
+          <p class="lead">A structured knowledge network of 60+ entries: crops, vegetables, fruits, legumes, tubers, trees/special plants, and weeds. Search and filter to explore lifespan, conditions, vulnerabilities, management, and impact.</p>
+        </div>
+
+        <div class="toolbar card">
+          <div class="toolbar-row">
+            <input id="plant-search" class="search-input" type="text" placeholder="Search by name, scientific name, vulnerability, or management…" aria-label="Search encyclopedia" />
+          </div>
+          <div class="filters" id="category-filters"></div>
+          <div class="toolbar-meta"><span id="result-count"></span></div>
+        </div>
+
+        <div id="plant-list" class="knowledge-grid"></div>
       </section>
 
       <!-- HELP -->
       <section id="help" class="section">
-        <h1 class="page-title"><span>❓</span> Help</h1>
-        <p class="simple-lead">How to use this app (simple steps).</p>
-        <div class="steps">
-          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-ico">🩺</div><p>Open <strong>Check Plant</strong>. Move bars for water, heat, sun, and air.</p></div></div>
-          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-ico">✅</div><p>Press <strong>Check Plant Now</strong>. Look at color: <span class="tag ok">Green = OK</span> <span class="tag water">Blue = Water</span> <span class="tag wet">Yellow = Too wet</span> <span class="tag stress">Red = Heat/Sun problem</span></p></div></div>
-          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-ico">🔊</div><p>Press <strong>Listen</strong> to hear the advice.</p></div></div>
-          <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-ico">🌦️</div><p>Open <strong>Weather</strong> and press button to see weather for your area.</p></div></div>
-          <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-ico">📚</div><p>Open <strong>Plant Book</strong> to learn plant life, weakness, and care.</p></div></div>
+        <div class="section-head">
+          <h1>Guide</h1>
+          <p class="lead">How to use PlantGuard efficiently.</p>
+        </div>
+        <div class="card-grid">
+          <article class="card">
+            <h3>1. Diagnose conditions</h3>
+            <p>Open <strong>Plant Diagnosis</strong>, set soil moisture, temperature, light, and humidity, then run the neural assessment. Review status, confidence, and prioritized recommendations.</p>
+          </article>
+          <article class="card">
+            <h3>2. Check weather context</h3>
+            <p>Open <strong>Weather Insights</strong> to fetch local conditions and receive practical guidance (e.g. rainfall, heat, wind, humidity considerations).</p>
+          </article>
+          <article class="card">
+            <h3>3. Use the knowledge network</h3>
+            <p>Open <strong>Encyclopedia</strong> to search and filter across crops, weeds, and special plants. Expand entries for lifespan, vulnerabilities/weaknesses, management or control, and impact.</p>
+          </article>
+          <article class="card">
+            <h3>Accessibility</h3>
+            <p>The diagnosis summary can be read aloud via your browser’s speech synthesis (where supported). Weather and location features require permission and connectivity.</p>
+          </article>
         </div>
       </section>
     </main>
   </div>
 
+  <script src="knowledge.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
