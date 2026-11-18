@@ -86,8 +86,9 @@ body {
 }
 .theme-btn {
   border: 1px solid rgba(247,244,236,0.28); background: rgba(247,244,236,0.10);
-  color: #f7f4ec; font: inherit; font-size: 14px; font-weight: 600;
-  padding: 8px 12px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+  color: #f7f4ec; font: inherit; font-size: 18px; line-height: 1;
+  width: 40px; height: 40px; padding: 0; border-radius: 999px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
 }
 .theme-btn:hover { background: rgba(247,244,236,0.18); }
 .brand { display: flex; align-items: center; gap: 10px; }

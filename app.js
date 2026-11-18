@@ -431,7 +431,7 @@ function applyTheme(theme) {
   const btn = document.getElementById("theme-btn");
   if (btn) {
     const next = t === "dark" ? "light" : "dark";
-    btn.textContent = next === "dark" ? "Dark mode" : "Light mode";
+    btn.textContent = next === "dark" ? "🌙" : "☀️";
     btn.setAttribute("aria-label", `Switch to ${next} mode`);
     btn.title = `Switch to ${next} mode`;
   }
