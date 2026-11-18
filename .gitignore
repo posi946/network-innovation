@@ -6,4 +6,4 @@ venv/
 .env
 .DS_Store
 .pytest_cache/
-model_weights.json
+

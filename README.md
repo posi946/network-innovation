@@ -39,7 +39,10 @@ Most simple plant reminders use fixed thresholds only. PlantGuard adds a learned
 
 ## Usage
 
-### 1) Run the demo
+### Web app (browser)
+Open `index.html` locally or deploy the repo as a static site (e.g. on Vercel). The browser app loads `model_weights.json` and runs the neural network + built-in care assistant client-side.
+
+### 1) Run the CLI demo
 Trains a quick model (if no saved weights exist) and prints diagnoses for sample scenarios:
 
 ```bash
@@ -53,7 +56,7 @@ python3 main.py train --samples 2000 --epochs 300
 
 This saves weights to `model_weights.json` by default.
 
-### 3) Predict from your own readings
+### 3) Predict from your own readings (CLI)
 Provide values in this order: `soil_moisture temperature_c light_level humidity`
 
 ```bash

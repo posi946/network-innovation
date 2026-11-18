@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlantGuard — Neural Plant Stress Diagnosis</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <p class="eyebrow">network-innovation / PlantGuard</p>
+      <h1>Neural plant stress diagnosis in your browser</h1>
+      <p class="lede">A lightweight neural network paired with a built-in care assistant. Enter sensor-like readings to predict plant status and get actionable recommendations.</p>
+    </header>
+
+    <section class="grid">
+      <section class="card">
+        <h2>Sensor readings</h2>
+        <form id="diagnose-form" class="form">
+          <label class="field">
+            <div class="field-head"><span>Soil moisture</span><output id="soil_moisture_val">55</output><span class="unit">%</span></div>
+            <input id="soil_moisture" name="soil_moisture" type="range" min="0" max="100" step="1" value="55" />
+          </label>
+          <label class="field">
+            <div class="field-head"><span>Temperature</span><output id="temperature_c_val">24</output><span class="unit">°C</span></div>
+            <input id="temperature_c" name="temperature_c" type="range" min="5" max="45" step="0.5" value="24" />
+          </label>
+          <label class="field">
+            <div class="field-head"><span>Light level</span><output id="light_level_val">60</output><span class="unit">%</span></div>
+            <input id="light_level" name="light_level" type="range" min="0" max="100" step="1" value="60" />
+          </label>
+          <label class="field">
+            <div class="field-head"><span>Humidity</span><output id="humidity_val">50</output><span class="unit">%</span></div>
+            <input id="humidity" name="humidity" type="range" min="10" max="100" step="1" value="50" />
+          </label>
+          <div class="actions">
+            <button type="submit" class="primary">Diagnose plant</button>
+            <button type="button" id="demo-btn" class="secondary">Try sample scenarios</button>
+          </div>
+        </form>
+        <p id="model-status" class="status muted">Loading neural network weights…</p>
+      </section>
+
+      <section class="card result-card" id="result" aria-live="polite">
+        <h2>Diagnosis</h2>
+        <div id="result-content" class="muted">Adjust readings and click <strong>Diagnose plant</strong>.</div>
+      </section>
+    </section>
+
+    <footer class="footer muted">
+      <p>PlantGuard runs a small feedforward neural network (4→12→4, ReLU + softmax) and an explainable care assistant entirely in your browser. Trained on synthetic sensor data for demonstration.</p>
+    </footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
