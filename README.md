@@ -37,10 +37,23 @@ Most simple plant reminders use fixed thresholds only. PlantGuard adds a learned
 - Python 3.10+ (tested with modern Python 3.x)
 - No third-party packages required
 
+## Web app (browser)
+Open `index.html` locally or deploy the repo as a static site (e.g. on Vercel). The browser app loads `model_weights.json` and runs the neural network + built-in care assistant client-side.
+
+**Sections (W3Schools-style sidebar layout):**
+- **Home / Check Plant:** Visual, farmer-friendly plant health check using the neural network. Big icons and simple color-coded results (OK / Needs Water / Too Much Water / Heat or Sun Problem) with a **Listen** option (text-to-speech) for spoken advice.
+- **Weather:** Uses your location (browser geolocation) and [Open-Meteo](https://open-meteo.com/) (no API key) to show current weather and simple farm advice.
+- **Plant Book (Encyclopedia):** Common crops/plants with lifespan/span, water/sun needs, weaknesses/problems, and care tips, with search.
+- **Help:** Simple step-by-step instructions.
+
 ## Usage
 
-### Web app (browser)
-Open `index.html` locally or deploy the repo as a static site (e.g. on Vercel). The browser app loads `model_weights.json` and runs the neural network + built-in care assistant client-side.
+### Web app (local)
+```bash
+cd network-innovation
+python3 -m http.server 8080
+# open http://localhost:8080
+```
 
 ### 1) Run the CLI demo
 Trains a quick model (if no saved weights exist) and prints diagnoses for sample scenarios:

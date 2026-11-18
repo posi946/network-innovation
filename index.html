@@ -3,55 +3,133 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PlantGuard — Neural Plant Stress Diagnosis</title>
+  <title>PlantGuard — Simple Plant Helper</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="page">
-    <header class="hero">
-      <p class="eyebrow">network-innovation / PlantGuard</p>
-      <h1>Neural plant stress diagnosis in your browser</h1>
-      <p class="lede">A lightweight neural network paired with a built-in care assistant. Enter sensor-like readings to predict plant status and get actionable recommendations.</p>
-    </header>
+  <header class="topbar">
+    <button id="menu-btn" class="menu-btn" aria-label="Open menu">☰</button>
+    <div class="brand"><span class="brand-icon">🌱</span> PlantGuard <span class="brand-sub">Plant Helper</span></div>
+  </header>
 
-    <section class="grid">
-      <section class="card">
-        <h2>Sensor readings</h2>
-        <form id="diagnose-form" class="form">
-          <label class="field">
-            <div class="field-head"><span>Soil moisture</span><output id="soil_moisture_val">55</output><span class="unit">%</span></div>
-            <input id="soil_moisture" name="soil_moisture" type="range" min="0" max="100" step="1" value="55" />
-          </label>
-          <label class="field">
-            <div class="field-head"><span>Temperature</span><output id="temperature_c_val">24</output><span class="unit">°C</span></div>
-            <input id="temperature_c" name="temperature_c" type="range" min="5" max="45" step="0.5" value="24" />
-          </label>
-          <label class="field">
-            <div class="field-head"><span>Light level</span><output id="light_level_val">60</output><span class="unit">%</span></div>
-            <input id="light_level" name="light_level" type="range" min="0" max="100" step="1" value="60" />
-          </label>
-          <label class="field">
-            <div class="field-head"><span>Humidity</span><output id="humidity_val">50</output><span class="unit">%</span></div>
-            <input id="humidity" name="humidity" type="range" min="10" max="100" step="1" value="50" />
-          </label>
-          <div class="actions">
-            <button type="submit" class="primary">Diagnose plant</button>
-            <button type="button" id="demo-btn" class="secondary">Try sample scenarios</button>
+  <div class="layout">
+    <nav id="sidebar" class="sidebar" aria-label="Sections">
+      <div class="sidebar-title">Menu</div>
+      <a href="#home" class="nav-link active" data-section="home"><span class="nav-ico">🏠</span><span>Home</span></a>
+      <a href="#check" class="nav-link" data-section="check"><span class="nav-ico">🩺</span><span>Check Plant</span></a>
+      <a href="#weather" class="nav-link" data-section="weather"><span class="nav-ico">🌦️</span><span>Weather</span></a>
+      <a href="#encyclopedia" class="nav-link" data-section="encyclopedia"><span class="nav-ico">📚</span><span>Plant Book</span></a>
+      <a href="#help" class="nav-link" data-section="help"><span class="nav-ico">❓</span><span>Help</span></a>
+    </nav>
+
+    <main class="content">
+      <!-- HOME -->
+      <section id="home" class="section active">
+        <div class="hero-card">
+          <div class="hero-big">🌱 PlantGuard</div>
+          <p class="hero-text">Simple help for your plants.</p>
+          <div class="big-actions">
+            <button class="big-btn green" data-go="check"><span class="big-ico">🩺</span><span>Check Plant</span></button>
+            <button class="big-btn blue" data-go="weather"><span class="big-ico">🌦️</span><span>Check Weather</span></button>
+            <button class="big-btn yellow" data-go="encyclopedia"><span class="big-ico">📚</span><span>Plant Book</span></button>
           </div>
-        </form>
-        <p id="model-status" class="status muted">Loading neural network weights…</p>
+        </div>
+        <div class="info-grid">
+          <div class="info-card">
+            <div class="info-ico">💧</div>
+            <h3>Water</h3>
+            <p>Too little or too much water can harm plants.</p>
+          </div>
+          <div class="info-card">
+            <div class="info-ico">☀️</div>
+            <h3>Sun & Heat</h3>
+            <p>Plants need the right sun and temperature.</p>
+          </div>
+          <div class="info-card">
+            <div class="info-ico">📖</div>
+            <h3>Learn</h3>
+            <p>See plant life, weakness, and care in Plant Book.</p>
+          </div>
+        </div>
       </section>
 
-      <section class="card result-card" id="result" aria-live="polite">
-        <h2>Diagnosis</h2>
-        <div id="result-content" class="muted">Adjust readings and click <strong>Diagnose plant</strong>.</div>
-      </section>
-    </section>
+      <!-- CHECK PLANT -->
+      <section id="check" class="section">
+        <h1 class="page-title"><span>🩺</span> Check Plant</h1>
+        <p class="simple-lead">Move the bars to match your plant. Then press the big green button.</p>
 
-    <footer class="footer muted">
-      <p>PlantGuard runs a small feedforward neural network (4→12→4, ReLU + softmax) and an explainable care assistant entirely in your browser. Trained on synthetic sensor data for demonstration.</p>
-    </footer>
-  </main>
+        <div class="panel-grid">
+          <div class="panel">
+            <h2 class="panel-title">Plant readings</h2>
+            <div class="field-card">
+              <div class="field-label"><span class="ico">💧</span><span>Water in soil</span><output id="soil_moisture_val" class="val">55</output></div>
+              <input id="soil_moisture" type="range" min="0" max="100" step="1" value="55" />
+              <div class="scale"><span>Dry</span><span>Wet</span></div>
+            </div>
+            <div class="field-card">
+              <div class="field-label"><span class="ico">🌡️</span><span>Hot or cold</span><output id="temperature_c_val" class="val">24</output><span class="small-unit">°C</span></div>
+              <input id="temperature_c" type="range" min="5" max="45" step="0.5" value="24" />
+              <div class="scale"><span>Cold</span><span>Hot</span></div>
+            </div>
+            <div class="field-card">
+              <div class="field-label"><span class="ico">☀️</span><span>Sun light</span><output id="light_level_val" class="val">60</output></div>
+              <input id="light_level" type="range" min="0" max="100" step="1" value="60" />
+              <div class="scale"><span>Dark</span><span>Bright</span></div>
+            </div>
+            <div class="field-card">
+              <div class="field-label"><span class="ico">💨</span><span>Air water (humidity)</span><output id="humidity_val" class="val">50</output></div>
+              <input id="humidity" type="range" min="10" max="100" step="1" value="50" />
+              <div class="scale"><span>Dry air</span><span>Wet air</span></div>
+            </div>
+            <button id="diagnose-btn" class="action-btn green big-wide">✅ Check Plant Now</button>
+            <p id="model-status" class="status">Loading plant brain…</p>
+          </div>
+
+          <div class="panel">
+            <h2 class="panel-title">Result</h2>
+            <div id="result-box" class="result-empty">
+              <div class="result-icon">🌿</div>
+              <p>Press <strong>Check Plant Now</strong> to see result.</p>
+            </div>
+            <button id="listen-btn" class="action-btn blue" style="display:none;">🔊 Listen</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- WEATHER -->
+      <section id="weather" class="section">
+        <h1 class="page-title"><span>🌦️</span> Weather</h1>
+        <p class="simple-lead">Check weather for your farm area.</p>
+        <div class="panel">
+          <button id="weather-btn" class="action-btn green big-wide">📍 Use My Location for Weather</button>
+          <p id="weather-status" class="status">Press the button to check weather.</p>
+          <div id="weather-result" class="weather-result"></div>
+        </div>
+      </section>
+
+      <!-- ENCYCLOPEDIA -->
+      <section id="encyclopedia" class="section">
+        <h1 class="page-title"><span>📚</span> Plant Book</h1>
+        <p class="simple-lead">Learn about plants: how long they live, their weakness, and care.</p>
+        <input id="plant-search" class="search" type="text" placeholder="Search plant name…" aria-label="Search plant" />
+        <div id="plant-list" class="plant-grid"></div>
+      </section>
+
+      <!-- HELP -->
+      <section id="help" class="section">
+        <h1 class="page-title"><span>❓</span> Help</h1>
+        <p class="simple-lead">How to use this app (simple steps).</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-ico">🩺</div><p>Open <strong>Check Plant</strong>. Move bars for water, heat, sun, and air.</p></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-ico">✅</div><p>Press <strong>Check Plant Now</strong>. Look at color: <span class="tag ok">Green = OK</span> <span class="tag water">Blue = Water</span> <span class="tag wet">Yellow = Too wet</span> <span class="tag stress">Red = Heat/Sun problem</span></p></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-ico">🔊</div><p>Press <strong>Listen</strong> to hear the advice.</p></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-ico">🌦️</div><p>Open <strong>Weather</strong> and press button to see weather for your area.</p></div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-ico">📚</div><p>Open <strong>Plant Book</strong> to learn plant life, weakness, and care.</p></div></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
