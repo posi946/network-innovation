@@ -371,7 +371,7 @@ function generateAssistantReply(raw) {
     if (matches.length === 1) {
       return `<p>From the knowledge network:</p>${formatEntryBrief(matches[0])}<p>Open <strong>Encyclopedia</strong> to view full details and related entries.</p>`;
     }
-    const blocks = matches.map((e, i) => `<hr style="border:none;border-top:1px solid #d7e2db;margin:10px 0">${formatEntryBrief(e)}`).join("");
+    const blocks = matches.map((e, i) => `<hr style="border:none;border-top:1px solid var(--border);margin:10px 0">${formatEntryBrief(e)}`).join("");
     return `<p>Top matches from the knowledge network:</p>${blocks}<p>Open <strong>Encyclopedia</strong> for more entries and filters.</p>`;
   }
 
