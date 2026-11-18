@@ -411,12 +411,60 @@ function initAssistant() {
 }
 
 /* ========== Navigation & init ========== */
+let revealObserver = null;
+
+function initRevealAnimations() {
+  const prefersReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const targets = document.querySelectorAll(".reveal");
+  if (prefersReduced) {
+    targets.forEach((el) => el.classList.add("is-visible"));
+    return;
+  }
+  if (revealObserver) revealObserver.disconnect();
+  revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-visible");
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+  targets.forEach((el) => {
+    el.classList.remove("is-visible");
+    revealObserver.observe(el);
+  });
+}
+
+function revealActiveSection() {
+  const active = document.querySelector(".section.active");
+  if (!active) return;
+  const prefersReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const items = active.querySelectorAll(".reveal");
+  items.forEach((el, i) => {
+    el.classList.remove("is-visible");
+    if (prefersReduced) {
+      el.classList.add("is-visible");
+    } else {
+      el.style.setProperty("--reveal-delay", `${Math.min(i * 60, 360)}ms`);
+      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("is-visible")));
+    }
+  });
+}
+
 function showSection(id) {
+  const current = document.querySelector(".section.active");
+  const next = document.getElementById(id);
+  if (!next) return;
   document.querySelectorAll(".section").forEach((s) => s.classList.toggle("active", s.id === id));
   document.querySelectorAll(".nav-link").forEach((a) => a.classList.toggle("active", a.dataset.section === id));
   document.getElementById("sidebar").classList.remove("open");
   if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+  revealActiveSection();
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 function getPreferredTheme() {
@@ -479,9 +527,11 @@ function setup() {
   document.getElementById("plant-search").addEventListener("input", (e) => { searchQuery = e.target.value; renderKnowledge(); });
 
   initAssistant();
+  initRevealAnimations();
 
   const hash = (location.hash || "#home").replace("#", "");
   if (document.getElementById(hash)) showSection(hash);
+  else revealActiveSection();
 }
 
 setup();
