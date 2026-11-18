@@ -309,6 +309,10 @@ h3 { font-size: 1.2rem; margin: 0 0 6px; color: var(--forest-900); }
 .split { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(16px, 2vw, 28px); align-items: start; }
 
 /* Buttons & inputs */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
 .btn {
   appearance: none; border: 1px solid transparent; border-radius: 999px; padding: 12px 20px;
   font: inherit; font-weight: 600; cursor: pointer;

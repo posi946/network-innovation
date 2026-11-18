@@ -205,6 +205,7 @@ async function checkWeather() {
 /* ========== Knowledge Network (encyclopedia) ========== */
 let activeCategory = "All";
 let searchQuery = "";
+let searchTimer = null;
 
 function getCategories() {
   const set = new Set((KNOWLEDGE_BASE || []).map((e) => e.category));
@@ -677,7 +678,15 @@ function setup() {
 
   renderFilters();
   renderKnowledge();
-  document.getElementById("plant-search").addEventListener("input", (e) => { searchQuery = e.target.value; renderKnowledge({ spin: true }); });
+  const searchInput = document.getElementById("plant-search");
+  searchInput.addEventListener("input", (e) => {
+    searchQuery = e.target.value;
+    if (searchTimer) clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      renderKnowledge({ spin: true });
+      searchTimer = null;
+    }, 320);
+  });
 
   initAssistant();
   initRevealAnimations();
