@@ -50,6 +50,7 @@ Open `index.html` locally or deploy the repo as a static site (e.g. on Vercel). 
 - **Plant Diagnosis:** Neural assessment from soil moisture, temperature, light, and humidity with confidence and prioritized recommendations (optional spoken summary via browser speech synthesis).
 - **Weather Insights:** Location-based current conditions using [Open-Meteo](https://open-meteo.com/) (no API key) with practical operational guidance.
 - **Encyclopedia (Knowledge Network):** 60+ structured entries spanning crops, vegetables, fruits, legumes, tubers, trees/special plants, and **weeds**. Includes lifespan/cycle, conditions, vulnerabilities/weaknesses, management/control, impact/use, and notes — with category filters and search for efficient exploration.
+- **Assistant:** A built-in conversational assistant (local, no external API key required) that can explain the latest diagnosis, interpret weather context, and answer questions using the knowledge network.
 - **Guide:** Usage and accessibility notes.
 
 ## Usage

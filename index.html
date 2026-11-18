@@ -22,6 +22,7 @@
       <a href="#diagnosis" class="nav-link" data-section="diagnosis">Plant Diagnosis</a>
       <a href="#weather" class="nav-link" data-section="weather">Weather Insights</a>
       <a href="#encyclopedia" class="nav-link" data-section="encyclopedia">Encyclopedia</a>
+      <a href="#assistant" class="nav-link" data-section="assistant">Assistant</a>
       <a href="#help" class="nav-link" data-section="help">Guide</a>
       <div class="sidebar-note">Forest-green intelligence for crops, weeds, and special plants.</div>
     </nav>
@@ -37,6 +38,7 @@
             <button class="btn primary" data-go="diagnosis">Open Diagnosis</button>
             <button class="btn secondary" data-go="encyclopedia">Browse Encyclopedia</button>
             <button class="btn secondary" data-go="weather">Check Weather</button>
+            <button class="btn secondary" data-go="assistant">Ask Assistant</button>
           </div>
         </div>
 
@@ -133,6 +135,30 @@
         <div id="plant-list" class="knowledge-grid"></div>
       </section>
 
+      <!-- ASSISTANT -->
+      <section id="assistant" class="section">
+        <div class="section-head">
+          <h1>Assistant</h1>
+          <p class="lead">Ask questions about plant diagnosis, weather decisions, crops, weeds, and the knowledge network. This built-in assistant runs locally in your browser and uses your latest diagnosis context when available.</p>
+        </div>
+
+        <div class="card chat-card">
+          <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
+          <div class="chat-suggestions" id="chat-suggestions">
+            <button class="chip" data-prompt="Explain my latest plant diagnosis">Explain my latest diagnosis</button>
+            <button class="chip" data-prompt="How should I water my crops today?">Watering advice</button>
+            <button class="chip" data-prompt="Tell me about maize weaknesses and care">Maize: weaknesses & care</button>
+            <button class="chip" data-prompt="How do I control Striga weed?">Control Striga weed</button>
+            <button class="chip" data-prompt="What plants are drought tolerant?">Drought-tolerant plants</button>
+          </div>
+          <form id="chat-form" class="chat-form">
+            <input id="chat-input" class="chat-input" type="text" placeholder="Ask a question (e.g. ‘weaknesses of tomato’, ‘how to manage speargrass’, ‘interpret my diagnosis’)…" autocomplete="off" />
+            <button type="submit" class="btn primary">Send</button>
+          </form>
+          <p class="status">Local assistant mode: answers are generated from built-in knowledge and app context. No external API key required.</p>
+        </div>
+      </section>
+
       <!-- HELP -->
       <section id="help" class="section">
         <div class="section-head">
@@ -151,6 +177,10 @@
           <article class="card">
             <h3>3. Use the knowledge network</h3>
             <p>Open <strong>Encyclopedia</strong> to search and filter across crops, weeds, and special plants. Expand entries for lifespan, vulnerabilities/weaknesses, management or control, and impact.</p>
+          </article>
+          <article class="card">
+            <h3>4. Ask the Assistant</h3>
+            <p>Open <strong>Assistant</strong> to ask questions in natural language. It can explain your latest diagnosis, interpret weather context, and retrieve details from the knowledge network (plants, weeds, vulnerabilities, management, and more).</p>
           </article>
           <article class="card">
             <h3>Accessibility</h3>
