@@ -509,6 +509,10 @@ function initTiltCards(root = document) {
       const still = Math.abs(targetRX - rx) < 0.01 && Math.abs(targetRY - ry) < 0.01 && Math.abs(targetTZ - tz) < 0.05 && Math.abs(targetLift - lift) < 0.05;
       if (still && !hovering) {
         card.classList.remove("is-tilting");
+        card.style.removeProperty("--rx");
+        card.style.removeProperty("--ry");
+        card.style.removeProperty("--tz");
+        card.style.removeProperty("--lift");
         raf = 0;
         return;
       }

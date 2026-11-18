@@ -379,25 +379,26 @@ input[type=range] { width: 100%; accent-color: var(--forest-700); cursor: pointe
 .filter-btn:hover { transform: translateY(-1px); }
 .filter-btn.active { background: var(--forest-800); color: #fffdf8; border-color: var(--forest-800); }
 .toolbar-meta { margin-top: 10px; font-size: 13px; color: var(--muted); }
-.knowledge-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 22px; perspective: 1400px; perspective-origin: 50% 30%; }
+.knowledge-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; perspective: 1400px; perspective-origin: 50% 30%; }
 .k-card {
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: 20px;
   padding: 18px;
-  box-shadow:
-    0 20px 45px -16px rgba(36,69,47,0.30),
-    0 8px 18px -10px rgba(36,69,47,0.18),
-    0 1px 0 rgba(255,255,255,0.35) inset;
+  box-shadow: var(--shadow-soft);
   transition: box-shadow .3s var(--ease-out), border-color .3s var(--ease-out);
   transform-style: preserve-3d;
-  --rx: 6deg;
-  --ry: -10deg;
+  --rx: 0deg;
+  --ry: 0deg;
+  --tz: 0px;
+  --lift: 0px;
 }
-.k-card:nth-child(2n) { --ry: 10deg; --rx: 5deg; }
-.k-card:nth-child(3n) { --ry: -6deg; --rx: -4deg; }
-.k-card:nth-child(4n) { --ry: 8deg; --rx: -5deg; }
-.k-card:hover { box-shadow: 0 30px 60px -18px rgba(36,69,47,0.34), 0 12px 24px -10px rgba(36,69,47,0.20); border-color: var(--border-strong); }
+.k-card:hover {
+  --tz: 18px;
+  --lift: -6px;
+  box-shadow: 0 30px 60px -18px rgba(36,69,47,0.32), 0 12px 24px -10px rgba(36,69,47,0.20);
+  border-color: var(--border-strong);
+}
 .k-card.phone-spin {
   animation: phoneSpin var(--spin-dur, 900ms) cubic-bezier(0.22, 0.8, 0.24, 1) both;
   animation-delay: var(--spin-delay, 0ms);
@@ -408,7 +409,7 @@ input[type=range] { width: 100%; accent-color: var(--forest-700); cursor: pointe
   18%  { transform: perspective(1100px) translate3d(0, -10px, 40px) rotateX(8deg) rotateY(70deg) scale(0.98); }
   50%  { transform: perspective(1100px) translate3d(0, -14px, 55px) rotateX(10deg) rotateY(180deg) scale(0.97); }
   82%  { transform: perspective(1100px) translate3d(0, -10px, 40px) rotateX(8deg) rotateY(290deg) scale(0.98); }
-  100% { transform: perspective(1100px) translate3d(0, 0, 0) rotateX(var(--rx, 6deg)) rotateY(var(--ry, -10deg)) scale(1); }
+  100% { transform: perspective(1100px) translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) scale(1); }
 }
 .k-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; margin-bottom: 6px; }
 .k-title { margin: 0; font-size: 1.25rem; color: var(--forest-900); }
