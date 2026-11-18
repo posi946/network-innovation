@@ -239,7 +239,7 @@ function renderKnowledge() {
   if (!list.length) { el.innerHTML = `<div class="card"><p class="status">No entries match the current filters.</p></div>`; return; }
 
   el.innerHTML = list.map((e) => `
-    <article class="k-card">
+    <article class="k-card tilt-card">
       <div class="k-head">
         <div>
           <h3 class="k-title">${e.name}</h3>
@@ -263,6 +263,7 @@ function renderKnowledge() {
         </details>
       </div>
     </article>`).join("");
+  initTiltCards(el);
 }
 
 /* ========== Assistant (local conversational layer) ========== */
@@ -467,6 +468,129 @@ function prefersReducedMotion() {
   return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+/* ========== 3D interactions ========== */
+function canUse3D() {
+  return !prefersReducedMotion();
+}
+
+function initTiltCards(root = document) {
+  if (!canUse3D()) return;
+  const cards = root.querySelectorAll ? root.querySelectorAll(".tilt-card") : [];
+  cards.forEach((card) => {
+    if (card.dataset.tiltInit === "1") return;
+    card.dataset.tiltInit = "1";
+    let rect = null;
+    let targetRX = 0, targetRY = 0, targetTZ = 0, targetLift = 0;
+    let rx = 0, ry = 0, tz = 0, lift = 0;
+    let raf = 0;
+    let hovering = false;
+
+    const updateRect = () => { rect = card.getBoundingClientRect(); };
+    const animate = () => {
+      const ease = hovering ? 0.18 : 0.12;
+      rx += (targetRX - rx) * ease;
+      ry += (targetRY - ry) * ease;
+      tz += (targetTZ - tz) * ease;
+      lift += (targetLift - lift) * ease;
+      card.style.setProperty("--rx", rx.toFixed(3) + "deg");
+      card.style.setProperty("--ry", ry.toFixed(3) + "deg");
+      card.style.setProperty("--tz", tz.toFixed(2) + "px");
+      card.style.setProperty("--lift", lift.toFixed(2) + "px");
+      const still = Math.abs(targetRX - rx) < 0.01 && Math.abs(targetRY - ry) < 0.01 && Math.abs(targetTZ - tz) < 0.05 && Math.abs(targetLift - lift) < 0.05;
+      if (still && !hovering) {
+        card.classList.remove("is-tilting");
+        raf = 0;
+        return;
+      }
+      raf = requestAnimationFrame(animate);
+    };
+    const ensure = () => { if (!raf) raf = requestAnimationFrame(animate); };
+
+    card.addEventListener("pointerenter", (e) => {
+      if (e.pointerType === "touch") return;
+      hovering = true;
+      updateRect();
+      card.classList.add("is-tilting");
+      targetTZ = 14; targetLift = -4;
+      ensure();
+    });
+    card.addEventListener("pointermove", (e) => {
+      if (!hovering || e.pointerType === "touch") return;
+      if (!rect) updateRect();
+      const px = (e.clientX - rect.left) / rect.width;
+      const py = (e.clientY - rect.top) / rect.height;
+      const dx = px - 0.5;
+      const dy = py - 0.5;
+      const max = 7;
+      targetRY = dx * max * 2;
+      targetRX = -dy * max * 2;
+      targetTZ = 16;
+      targetLift = -4;
+      ensure();
+    });
+    card.addEventListener("pointerleave", () => {
+      hovering = false;
+      targetRX = 0; targetRY = 0; targetTZ = 0; targetLift = 0;
+      ensure();
+    });
+    window.addEventListener("resize", () => { rect = null; }, { passive: true });
+  });
+}
+
+function initHero3D() {
+  if (!canUse3D()) return;
+  const hero = document.getElementById("home-hero");
+  if (!hero || hero.dataset.hero3d === "1") return;
+  hero.dataset.hero3d = "1";
+  const layers = hero.querySelectorAll(".depth-layer");
+  const orbs = hero.querySelectorAll(".depth-orb, .depth-ring, .depth-grid");
+  let rect = null;
+  let tx = 0, ty = 0, cx = 0, cy = 0;
+  let raf = 0;
+
+  const updateRect = () => { rect = hero.getBoundingClientRect(); };
+  const animate = () => {
+    cx += (tx - cx) * 0.08;
+    cy += (ty - cy) * 0.08;
+    layers.forEach((el) => {
+      const d = parseFloat(el.dataset.depth || "20");
+      const mx = cx * d * 0.25;
+      const my = cy * d * 0.25;
+      el.style.transform = `translate3d(${mx}px, ${my}px, ${d}px) rotateX(${(-cy * d * 0.08).toFixed(2)}deg) rotateY(${(cx * d * 0.08).toFixed(2)}deg)`;
+    });
+    orbs.forEach((el, i) => {
+      const d = 20 + i * 12;
+      const mx = cx * d * -0.35;
+      const my = cy * d * -0.25;
+      const base = el.classList.contains("depth-grid") ? " translateZ(12px) rotateX(58deg) scale(1.15)" :
+                   el.classList.contains("ring-a") ? " translateZ(45px) rotateX(68deg)" :
+                   el.classList.contains("ring-b") ? " translateZ(80px) rotateX(72deg)" :
+                   el.classList.contains("orb-a") ? " translateZ(60px)" : " translateZ(30px)";
+      el.style.transform = `translate3d(${mx}px, ${my}px, 0px)` + base;
+    });
+    if (Math.abs(tx - cx) < 0.001 && Math.abs(ty - cy) < 0.001 && tx === 0 && ty === 0) {
+      raf = 0; return;
+    }
+    raf = requestAnimationFrame(animate);
+  };
+  const ensure = () => { if (!raf) raf = requestAnimationFrame(animate); };
+
+  hero.addEventListener("pointermove", (e) => {
+    if (e.pointerType === "touch") return;
+    if (!rect) updateRect();
+    tx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    ty = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+    ensure();
+  });
+  hero.addEventListener("pointerleave", () => { tx = 0; ty = 0; ensure(); });
+  window.addEventListener("resize", () => { rect = null; }, { passive: true });
+}
+
+function init3DEffects() {
+  initTiltCards(document);
+  initHero3D();
+}
+
 function getPreferredTheme() {
   const saved = localStorage.getItem("pg-theme");
   if (saved === "light" || saved === "dark") return saved;
@@ -528,6 +652,7 @@ function setup() {
 
   initAssistant();
   initRevealAnimations();
+  init3DEffects();
 
   const hash = (location.hash || "#home").replace("#", "");
   if (document.getElementById(hash)) showSection(hash);

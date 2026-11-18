@@ -34,28 +34,37 @@
     <main class="content">
       <!-- HOME -->
       <section id="home" class="section active">
-        <div class="hero reveal">
-          <p class="eyebrow">Neural diagnosis • Weather context • Knowledge network</p>
-          <h1>PlantGuard Knowledge Network</h1>
-          <p class="lead">An adult-focused, practical platform combining a browser-based neural network, local weather insights, and an extensive encyclopedia of plants, weeds, and special species.</p>
-          <div class="hero-actions">
-            <button class="btn primary" data-go="diagnosis">Open Diagnosis</button>
-            <button class="btn secondary" data-go="encyclopedia">Browse Encyclopedia</button>
-            <button class="btn secondary" data-go="weather">Check Weather</button>
-            <button class="btn secondary" data-go="assistant">Ask Assistant</button>
+        <div class="hero reveal scene-3d" id="home-hero">
+          <div class="hero-depth" aria-hidden="true">
+            <span class="depth-orb orb-a"></span>
+            <span class="depth-orb orb-b"></span>
+            <span class="depth-grid"></span>
+            <span class="depth-ring ring-a"></span>
+            <span class="depth-ring ring-b"></span>
+          </div>
+          <div class="hero-content">
+            <p class="eyebrow depth-layer" data-depth="18">Neural diagnosis • Weather context • Knowledge network</p>
+            <h1 class="depth-layer" data-depth="34">PlantGuard Knowledge Network</h1>
+            <p class="lead depth-layer" data-depth="22">An adult-focused, practical platform combining a browser-based neural network, local weather insights, and an extensive encyclopedia of plants, weeds, and special species.</p>
+            <div class="hero-actions depth-layer" data-depth="26">
+              <button class="btn primary" data-go="diagnosis">Open Diagnosis</button>
+              <button class="btn secondary" data-go="encyclopedia">Browse Encyclopedia</button>
+              <button class="btn secondary" data-go="weather">Check Weather</button>
+              <button class="btn secondary" data-go="assistant">Ask Assistant</button>
+            </div>
           </div>
         </div>
 
-        <div class="card-grid three reveal-group">
-          <article class="card reveal">
+        <div class="card-grid three reveal-group scene-3d-flat">
+          <article class="card reveal tilt-card">
             <h3>Neural Plant Diagnosis</h3>
             <p>Evaluate soil moisture, temperature, light, and humidity with a lightweight neural model and receive clear, actionable recommendations.</p>
           </article>
-          <article class="card reveal">
+          <article class="card reveal tilt-card">
             <h3>Weather-Aware Decisions</h3>
             <p>Use location-based current conditions (via Open-Meteo) to inform irrigation, protection, and field planning.</p>
           </article>
-          <article class="card reveal">
+          <article class="card reveal tilt-card">
             <h3>Encyclopedia & Weeds</h3>
             <p>Explore 60+ entries covering crops, vegetables, fruits, legumes, tubers, trees/special plants, and weeds — including lifespan, vulnerabilities, and management.</p>
           </article>
@@ -69,8 +78,8 @@
           <p class="lead">Adjust field or plant conditions and run the neural assessment. Results are designed to be clear, practical, and efficient.</p>
         </div>
 
-        <div class="split reveal-group">
-          <div class="card reveal">
+        <div class="split reveal-group scene-3d-flat">
+          <div class="card reveal tilt-card">
             <h2>Input conditions</h2>
             <div class="field">
               <div class="field-top"><label for="soil_moisture">Soil moisture</label><span><output id="soil_moisture_val">55</output>%</span></div>
@@ -99,7 +108,7 @@
             <p id="model-status" class="status">Loading model…</p>
           </div>
 
-          <div class="card reveal">
+          <div class="card reveal tilt-card">
             <h2>Assessment</h2>
             <div id="result-box" class="empty-state">Set conditions and run the diagnosis to view status, confidence, and recommendations.</div>
           </div>
@@ -112,7 +121,7 @@
           <h1>Weather Insights</h1>
           <p class="lead">Retrieve current local conditions to support timely farm decisions. Powered by Open-Meteo (no API key required).</p>
         </div>
-        <div class="card reveal">
+        <div class="card reveal tilt-card">
           <div class="actions-row">
             <button id="weather-btn" class="btn primary">Use my location</button>
           </div>
@@ -128,7 +137,7 @@
           <p class="lead">A structured knowledge network of 60+ entries: crops, vegetables, fruits, legumes, tubers, trees/special plants, and weeds. Search and filter to explore lifespan, conditions, vulnerabilities, management, and impact.</p>
         </div>
 
-        <div class="toolbar card reveal">
+        <div class="toolbar card reveal tilt-card">
           <div class="toolbar-row">
             <input id="plant-search" class="search-input" type="text" placeholder="Search by name, scientific name, vulnerability, or management…" aria-label="Search encyclopedia" />
           </div>
@@ -146,7 +155,7 @@
           <p class="lead">Ask questions about plant diagnosis, weather decisions, crops, weeds, and the knowledge network. This built-in assistant runs locally in your browser and uses your latest diagnosis context when available.</p>
         </div>
 
-        <div class="card chat-card reveal">
+        <div class="card chat-card reveal tilt-card">
           <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
           <div class="chat-suggestions" id="chat-suggestions">
             <button class="chip" data-prompt="Explain my latest plant diagnosis">Explain my latest diagnosis</button>
@@ -170,10 +179,10 @@
           <p class="lead">A refined botanical reference presented in a calm, information-led format — origin, varieties, preparation, safety, and product knowledge.</p>
         </div>
 
-        <div class="chamomile-wrap reveal">
+        <div class="chamomile-wrap reveal scene-3d-flat">
           <div class="chamomile-panels">
             <!-- Panel 1: Information-led -->
-            <article class="ch-panel ch-panel-main">
+            <article class="ch-panel ch-panel-main tilt-card">
               <div class="ch-pattern" aria-hidden="true"></div>
               <div class="ch-main-inner">
                 <header class="ch-header">
@@ -229,7 +238,7 @@
             </article>
 
             <!-- Panel 2: Aloe-like leaves -->
-            <article class="ch-panel ch-panel-photo p2">
+            <article class="ch-panel ch-panel-photo p2 tilt-card">
               <div class="ch-photo-art aloe" aria-hidden="true"></div>
               <div class="ch-photo-overlay">
                 <p class="ch-copy">Pure botanicals, gently prepared.</p>
@@ -238,7 +247,7 @@
             </article>
 
             <!-- Panel 3: Broad leaves with small flowers -->
-            <article class="ch-panel ch-panel-photo p3">
+            <article class="ch-panel ch-panel-photo p3 tilt-card">
               <div class="ch-photo-art broad" aria-hidden="true"></div>
               <div class="ch-photo-overlay">
                 <p class="ch-copy">Rooted in nature, crafted with care.</p>
@@ -260,24 +269,24 @@
           <h1>Guide</h1>
           <p class="lead">How to use PlantGuard efficiently.</p>
         </div>
-        <div class="card-grid reveal-group">
-          <article class="card reveal">
+        <div class="card-grid reveal-group scene-3d-flat">
+          <article class="card reveal tilt-card">
             <h3>1. Diagnose conditions</h3>
             <p>Open <strong>Plant Diagnosis</strong>, set soil moisture, temperature, light, and humidity, then run the neural assessment. Review status, confidence, and prioritized recommendations.</p>
           </article>
-          <article class="card reveal">
+          <article class="card reveal tilt-card">
             <h3>2. Check weather context</h3>
             <p>Open <strong>Weather Insights</strong> to fetch local conditions and receive practical guidance (e.g. rainfall, heat, wind, humidity considerations).</p>
           </article>
-          <article class="card reveal">
+          <article class="card reveal tilt-card">
             <h3>3. Use the knowledge network</h3>
             <p>Open <strong>Encyclopedia</strong> to search and filter across crops, weeds, and special plants. Expand entries for lifespan, vulnerabilities/weaknesses, management or control, and impact.</p>
           </article>
-          <article class="card reveal">
+          <article class="card reveal tilt-card">
             <h3>4. Ask the Assistant</h3>
             <p>Open <strong>Assistant</strong> to ask questions in natural language. It can explain your latest diagnosis, interpret weather context, and retrieve details from the knowledge network (plants, weeds, vulnerabilities, management, and more).</p>
           </article>
-          <article class="card reveal">
+          <article class="card reveal tilt-card">
             <h3>Accessibility</h3>
             <p>The diagnosis summary can be read aloud via your browser’s speech synthesis (where supported). Weather and location features require permission and connectivity.</p>
           </article>
