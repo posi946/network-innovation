@@ -222,13 +222,14 @@ function renderFilters() {
   wrap.querySelectorAll(".filter-btn").forEach((btn) => btn.addEventListener("click", () => {
     activeCategory = btn.dataset.cat;
     renderFilters();
-    renderKnowledge();
+    renderKnowledge({ spin: true });
   }));
 }
 
 function typeClass(cat) { return (cat || "").replace(/[^a-zA-Z]/g, "-"); }
 
-function renderKnowledge() {
+function renderKnowledge(opts = {}) {
+  const spin = !!opts.spin && !prefersReducedMotion();
   const q = searchQuery.trim().toLowerCase();
   let list = (KNOWLEDGE_BASE || []).filter((e) => activeCategory === "All" || e.category === activeCategory);
   if (q) list = list.filter((e) => entryText(e).includes(q));
@@ -236,10 +237,13 @@ function renderKnowledge() {
   document.getElementById("result-count").textContent = `${list.length} entr${list.length === 1 ? "y" : "ies"} shown (${(KNOWLEDGE_BASE||[]).length} total in network)`;
 
   const el = document.getElementById("plant-list");
-  if (!list.length) { el.innerHTML = `<div class="card"><p class="status">No entries match the current filters.</p></div>`; return; }
+  if (!list.length) {
+    el.innerHTML = `<div class="card${spin ? " phone-spin" : ""}" ${spin ? 'style="--spin-dur:800ms;--spin-delay:0ms"' : ""}><p class="status">No entries match the current filters.</p></div>`;
+    return;
+  }
 
-  el.innerHTML = list.map((e) => `
-    <article class="k-card tilt-card">
+  el.innerHTML = list.map((e, i) => `
+    <article class="k-card tilt-card${spin ? " phone-spin" : ""}" ${spin ? `style="--spin-delay:${Math.min(i * 55, 440)}ms;--spin-dur:${820 + (i % 4) * 60}ms"` : ""}>
       <div class="k-head">
         <div>
           <h3 class="k-title">${e.name}</h3>
@@ -263,6 +267,12 @@ function renderKnowledge() {
         </details>
       </div>
     </article>`).join("");
+
+  if (spin) {
+    el.querySelectorAll(".k-card.phone-spin, .card.phone-spin").forEach((card) => {
+      card.addEventListener("animationend", () => card.classList.remove("phone-spin"), { once: true });
+    });
+  }
   initTiltCards(el);
 }
 
@@ -335,7 +345,7 @@ function generateAssistantReply(raw) {
     return "Hello. I can help with: interpreting your latest plant diagnosis, weather-informed decisions, and detailed information on crops, weeds, and special plants in the knowledge network. What would you like to know?";
   }
   if (/\b(help|what can you do|how to use)\b/.test(q)) {
-    return "I can: (1) explain your latest diagnosis and recommendations, (2) summarize weather guidance if you’ve checked Weather Insights, and (3) answer questions using the encyclopedia (e.g. lifespan, vulnerabilities/weaknesses, management/control, and impact for 60+ plants and weeds). Try asking about a specific plant/weed or ‘explain my latest diagnosis’.";
+    return "I can: (1) explain your latest diagnosis and recommendations, (2) summarize weather guidance if you’ve checked Weather Insights, and (3) answer questions using the encyclopedia (e.g. lifespan, vulnerabilities/weaknesses, management/control, and impact for 80+ plants and weeds). Try asking about a specific plant/weed or ‘explain my latest diagnosis’.";
   }
   if (/\b(thank|thanks)\b/.test(q)) {
     return "You’re welcome. If you need details on a specific crop, weed, or your diagnosis, ask anytime.";
@@ -408,7 +418,7 @@ function initAssistant() {
   document.querySelectorAll("#chat-suggestions .chip").forEach((btn) => {
     btn.addEventListener("click", () => handleChatSubmit(btn.dataset.prompt || btn.textContent));
   });
-  addChatMessage("assistant", `<p><strong>PlantGuard Assistant</strong> is ready.</p><p>I can explain your latest neural diagnosis, provide weather-informed guidance, and answer questions from the knowledge network (60+ plants, weeds, and special species). Ask me anything to get started.</p>`);
+  addChatMessage("assistant", `<p><strong>PlantGuard Assistant</strong> is ready.</p><p>I can explain your latest neural diagnosis, provide weather-informed guidance, and answer questions from the knowledge network (80+ plants, weeds, and special species). Ask me anything to get started.</p>`);
 }
 
 /* ========== Navigation & init ========== */
@@ -546,44 +556,59 @@ function initHero3D() {
   const orbs = hero.querySelectorAll(".depth-orb, .depth-ring, .depth-grid");
   let rect = null;
   let tx = 0, ty = 0, cx = 0, cy = 0;
+  let hovering = false;
   let raf = 0;
+  const t0 = performance.now();
 
   const updateRect = () => { rect = hero.getBoundingClientRect(); };
-  const animate = () => {
-    cx += (tx - cx) * 0.08;
-    cy += (ty - cy) * 0.08;
+  const animate = (now) => {
+    const t = (now - t0) / 1000;
+    const idleX = hovering ? 0 : Math.sin(t * 0.45) * 0.22;
+    const idleY = hovering ? 0 : Math.cos(t * 0.38) * 0.16;
+    const goalX = tx + idleX;
+    const goalY = ty + idleY;
+
+    cx += (goalX - cx) * 0.08;
+    cy += (goalY - cy) * 0.08;
+
     layers.forEach((el) => {
       const d = parseFloat(el.dataset.depth || "20");
-      const mx = cx * d * 0.25;
-      const my = cy * d * 0.25;
-      el.style.transform = `translate3d(${mx}px, ${my}px, ${d}px) rotateX(${(-cy * d * 0.08).toFixed(2)}deg) rotateY(${(cx * d * 0.08).toFixed(2)}deg)`;
+      const mx = cx * d * 0.28;
+      const my = cy * d * 0.28;
+      el.style.transform = `translate3d(${mx}px, ${my}px, ${d}px) rotateX(${(-cy * d * 0.09).toFixed(2)}deg) rotateY(${(cx * d * 0.09).toFixed(2)}deg)`;
     });
     orbs.forEach((el, i) => {
       const d = 20 + i * 12;
-      const mx = cx * d * -0.35;
-      const my = cy * d * -0.25;
-      const base = el.classList.contains("depth-grid") ? " translateZ(12px) rotateX(58deg) scale(1.15)" :
-                   el.classList.contains("ring-a") ? " translateZ(45px) rotateX(68deg)" :
-                   el.classList.contains("ring-b") ? " translateZ(80px) rotateX(72deg)" :
-                   el.classList.contains("orb-a") ? " translateZ(60px)" : " translateZ(30px)";
+      const mx = cx * d * -0.32;
+      const my = cy * d * -0.22;
+      const base = el.classList.contains("depth-grid") ? " translateZ(18px) rotateX(62deg) scale(1.2)" :
+                   el.classList.contains("ring-a") ? " translateZ(55px) rotateX(68deg)" :
+                   el.classList.contains("ring-b") ? " translateZ(90px) rotateX(72deg)" :
+                   el.classList.contains("orb-a") ? " translateZ(70px)" : " translateZ(40px)";
       el.style.transform = `translate3d(${mx}px, ${my}px, 0px)` + base;
     });
-    if (Math.abs(tx - cx) < 0.001 && Math.abs(ty - cy) < 0.001 && tx === 0 && ty === 0) {
-      raf = 0; return;
-    }
+
     raf = requestAnimationFrame(animate);
   };
   const ensure = () => { if (!raf) raf = requestAnimationFrame(animate); };
 
+  hero.addEventListener("pointerenter", (e) => {
+    if (e.pointerType === "touch") return;
+    hovering = true;
+    updateRect();
+  });
   hero.addEventListener("pointermove", (e) => {
     if (e.pointerType === "touch") return;
+    hovering = true;
     if (!rect) updateRect();
     tx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
     ty = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
     ensure();
   });
-  hero.addEventListener("pointerleave", () => { tx = 0; ty = 0; ensure(); });
+  hero.addEventListener("pointerleave", () => { hovering = false; tx = 0; ty = 0; });
   window.addEventListener("resize", () => { rect = null; }, { passive: true });
+
+  ensure();
 }
 
 function init3DEffects() {
@@ -648,7 +673,7 @@ function setup() {
 
   renderFilters();
   renderKnowledge();
-  document.getElementById("plant-search").addEventListener("input", (e) => { searchQuery = e.target.value; renderKnowledge(); });
+  document.getElementById("plant-search").addEventListener("input", (e) => { searchQuery = e.target.value; renderKnowledge({ spin: true }); });
 
   initAssistant();
   initRevealAnimations();
