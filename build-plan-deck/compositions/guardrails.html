@@ -1,0 +1,71 @@
+<template>
+<style>
+
+#root {
+  position: absolute; inset: 0; background: var(--bg, #dfe9d4); color: var(--ink, #24452f);
+  font-family: Inter, Arial, sans-serif; overflow: hidden;
+}
+.clip { position: absolute; inset: 0; padding: 120px 200px; }
+.content { height: 100%; display: flex; flex-direction: column; justify-content: center; }
+.kicker {
+  font-family: 'Space Mono', monospace; font-size: 40px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--kicker, #5f705f); margin-bottom: 24px;
+}
+.title { font-size: 100px; line-height: 1.01; font-weight: 900; letter-spacing: -.035em; margin-bottom: 28px; }
+.sub { font-size: 46px; line-height: 1.22; color: var(--subink, #4f6653); max-width: 1500px; }
+.cards { display: grid; gap: 24px; margin-top: 50px; }
+.cards.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cards.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.card {
+  background: var(--cardbg, #e8f0e1); border: 2px solid var(--cardborder, #b8c9ad);
+  border-radius: 18px; padding: 34px; min-height: 320px;
+}
+.card h3 { font-size: 46px; line-height: 1.1; font-weight: 800; margin-bottom: 18px; }
+.card p { font-size: 40px; line-height: 1.22; color: var(--subink, #4f6653); }
+.stats { display: flex; gap: 64px; margin-top: 62px; }
+.stat-n { font-size: 104px; line-height: 1; font-weight: 900; color: var(--statcolor, #b58f20); }
+.stat-l {
+  font-family: 'Space Mono', monospace; font-size: 40px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--subink, #4f6653); margin-top: 12px;
+}
+.tl { width: 100%; border-collapse: collapse; margin-top: 46px; font-size: 42px; }
+.tl th {
+  font-family: 'Space Mono', monospace; font-size: 40px; letter-spacing: .08em;
+  text-transform: uppercase; text-align: left; color: var(--kicker, #5f705f);
+  border-bottom: 3px solid var(--cardborder, #b8c9ad); padding: 10px 16px;
+}
+.tl td { padding: 11px 16px; border-bottom: 1px solid var(--cardborder, #b8c9ad); line-height: 1.12; }
+.tl td.wk { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--statcolor, #b58f20); }
+.footnote {
+  margin-top: 54px; font-family: 'Space Mono', monospace; font-size: 40px;
+  letter-spacing: .06em; color: var(--subink, #4f6653);
+}
+.decor { pointer-events: none; }
+.orb {
+  position: absolute; right: 120px; top: 80px; width: 380px; height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(228,200,79,.42), rgba(63,95,69,.04) 72%);
+}
+
+</style>
+<div id="root" data-composition-id="guardrails" data-width="1920" data-height="1080">
+  <div id="guardrails-content" class="clip" data-start="0" data-duration="6" data-track-index="0">
+    <div class="content">
+      <div class="kicker">NON-NEGOTIABLES</div>
+      <div class="title">Three rules that protect the build</div>
+      <div class="sub">Miss one of these and the cost compounds later.</div>
+<div class="cards three"><div class="card"><h3>Week 6 · payments</h3><p>Idempotency, state machine, webhook dedupe, auto-reversal, stale expiry.</p></div>
+<div class="card"><h3>Day 49 · privacy</h3><p>NDPR + GDPR. Delete and export endpoints before launch.</p></div>
+<div class="card"><h3>Saturday · commit</h3><p>No new code Saturdays. Test the week, then commit and push.</p></div></div>
+    </div>
+  </div>
+  <div id="guardrails-decor" class="clip decor" data-start="0" data-duration="6" data-track-index="0">
+    <div class="orb" id="guardrails-orb"></div>
+  </div>
+</div>
+<script>
+  const tl = gsap.timeline({ paused: true });
+  tl.to("#guardrails-orb", { x: 55, y: -28, duration: 6, ease: "none" }, 0);
+  window.__timelines["guardrails"] = tl;
+</script>
+</template>

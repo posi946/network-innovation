@@ -19,6 +19,7 @@ The app runs as a static site: neural inference, search, and the assistant run c
 - **3D experience:** Clearly visible 3D hero depth/motion, depth-styled surfaces, **realistic 3D hover/tilt effects** on cards (including encyclopedia results), and a **3D phone-like spin animation** when encyclopedia results update from search/filter (respects `prefers-reduced-motion`).
 - **Assistant:** Built-in local assistant that can explain the latest diagnosis, interpret available weather context, and answer questions from the encyclopedia/app context.
 - **Chamomile Botanical Guide:** Integrated informational section (origin & habitat, varieties, classic records, brewing methods, dosage & cautions, products & processing, and presentation grades) in the Natura Care style.
+- **Daily Build Plan:** A 14-week / 70-session delivery roadmap with week-by-week targets, copyable prompts, and a summary table, restyled in the PlantGuard chamomile palette with light/dark support.
 - **Design & accessibility:** Wide, dynamic chamomile palette (green-forward), **light/dark mode** with sun/moon toggle and saved preference, responsive layout, and motion/accessibility considerations.
 
 ## Project structure
@@ -26,7 +27,7 @@ The app runs as a static site: neural inference, search, and the assistant run c
 .
 ├── index.html          # Web app UI and sections
 ├── styles.css          # Chamomile theme, layout, 3D/hover/spin styles, light/dark modes
-├── app.js              # Browser NN inference, diagnosis, weather, encyclopedia, assistant, UI/3D behavior
+├── app.js              # Browser NN inference, diagnosis, weather, encyclopedia, assistant, build plan, UI/3D behavior
 ├── knowledge.js        # Knowledge network dataset (82 plants, weeds, herbs, special species)
 ├── model_weights.json  # Trained neural network weights for browser inference
 ├── main.py             # CLI entrypoint
