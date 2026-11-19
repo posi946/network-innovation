@@ -1,5 +1,23 @@
 /* DocuSense Lex — integrated into PlantGuard (Days 11–15). */
-#lex-root { color: #e7f0df; }
+#lex-root, #lex-inline { color: #e7f0df; }
+
+/* Lex Core mounted inside the PlantGuard Assistant section. */
+.lex-shell-inline {
+  display: block; min-height: 0; padding: 1.2rem 1.5rem; border-radius: 14px;
+  background: #080514; border: 1px solid #2a2440;
+}
+.lex-shell-inline .lex-panel-head { border-bottom: 0; padding: 0 0 .8rem; }
+.lex-inline-body { display: flex; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap; }
+.lex-shell-inline .lex-orb { width: 168px; height: 168px; }
+.lex-shell-inline .lex-core { width: 112px; height: 112px; }
+.lex-shell-inline .lex-ring-3 { inset: 24px; }
+.lex-shell-inline .lex-main { flex: 0 0 auto; gap: .5rem; }
+.lex-shell-inline .lex-hint { font-size: .9rem; }
+.lex-shell-inline .lex-jurisdiction { font-size: .68rem; }
+.lex-shell-inline .lex-controls { flex-direction: column; gap: .5rem; }
+.lex-shell-inline .lex-banner { max-width: 280px; font-size: .72rem; }
+.lex-inline-note { max-width: 320px; color: #9fb59c; font-family: Georgia, serif; font-size: .92rem; line-height: 1.5; }
+
 .lex-shell {
   position: relative; display: grid; grid-template-columns: minmax(0, 3fr) minmax(340px, 2fr);
   gap: 2rem; min-height: 640px; background: #080514; border: 1px solid #2a2440;

@@ -400,11 +400,22 @@ function generateAssistantReply(raw) {
 
 function handleChatSubmit(text) {
   const t = text.trim();
-  if (!t) return;
+  if (!t) return "";
   addChatMessage("user", `<p>${escapeHtml(t)}</p>`);
   const reply = generateAssistantReply(t);
   addChatMessage("assistant", reply);
+  return reply;
 }
+
+/* Bridge used by Lex Core when it is mounted inside the Assistant section. */
+window.lexAssistant = {
+  submit: (text) => handleChatSubmit(text),
+  replyText: (html) => {
+    const holder = document.createElement("div");
+    holder.innerHTML = html || "";
+    return (holder.textContent || holder.innerText || "").trim();
+  },
+};
 
 function initAssistant() {
   const form = document.getElementById("chat-form");
@@ -419,7 +430,7 @@ function initAssistant() {
   document.querySelectorAll("#chat-suggestions .chip").forEach((btn) => {
     btn.addEventListener("click", () => handleChatSubmit(btn.dataset.prompt || btn.textContent));
   });
-  addChatMessage("assistant", `<p><strong>PlantGuard Assistant</strong> is ready.</p><p>I can explain your latest neural diagnosis, provide weather-informed guidance, and answer questions from the knowledge network (80+ plants, weeds, and special species). Ask me anything to get started.</p>`);
+  addChatMessage("assistant", `<p><strong>PlantGuard Assistant + Lex Core</strong> is ready.</p><p>Type below, or use the Lex orb to speak. I can explain your latest neural diagnosis, provide weather-informed guidance, and answer questions from the knowledge network (80+ plants, weeds, and special species). Ask me anything to get started.</p>`);
 }
 
 /* ========== Navigation & init ========== */

@@ -190,10 +190,10 @@
 
   /* ---------- Lex page ---------- */
   window.initLex = function () {
-    var root = document.getElementById("lex-root");
+    var root = document.getElementById("lex-inline") || document.getElementById("lex-root");
     if (!root || root.dataset.lexInit === "1") return;
     root.dataset.lexInit = "1";
-    var s = settings();
+    var integrated = root.id === "lex-inline";
     var state = "idle", amplitude = 0;
     var context = new LexContextManager();
     var sessionId = null, recognition = null, audioStream = null, audioCtx = null, raf = null;
@@ -206,37 +206,51 @@
       stars += '<i style="left:' + left + '%;top:' + top + '%;opacity:' + op + ';animation-delay:' + delay + 's"></i>';
     }
 
-    root.innerHTML =
-      '<div class="lex-shell">' +
-        '<div class="lex-stars">' + stars + '</div>' +
-        '<div class="lex-main">' +
-          '<div class="lex-orb-wrap">' +
-            '<div class="lex-orb" id="lex-orb" data-state="idle">' +
-              '<div class="lex-ring lex-ring-1"></div><div class="lex-ring lex-ring-2"></div>' +
-              '<div class="lex-ring lex-ring-3"></div><div class="lex-scan"></div>' +
-              '<div class="lex-core"></div><div class="lex-corona"></div>' +
-            '</div>' +
-            '<div class="lex-hint" id="lex-hint">' + tr("idle") + '</div>' +
-            '<div class="lex-jurisdiction">⚖ ' + tr("jurisdiction") + '</div>' +
+    var head =
+      '<div class="lex-panel-head"><span class="lex-dot" id="lex-dot"></span>' +
+      '<strong>LEX · CORE LINK</strong><span class="lex-status" id="lex-status">IDLE</span></div>';
+    var core =
+      '<div class="lex-main">' +
+        '<div class="lex-orb-wrap">' +
+          '<div class="lex-orb" id="lex-orb" data-state="idle">' +
+            '<div class="lex-ring lex-ring-1"></div><div class="lex-ring lex-ring-2"></div>' +
+            '<div class="lex-ring lex-ring-3"></div><div class="lex-scan"></div>' +
+            '<div class="lex-core"></div><div class="lex-corona"></div>' +
           '</div>' +
-          '<div class="lex-controls">' +
-            '<button type="button" class="lex-btn lex-btn-primary" id="lex-mic">🎙 Start listening</button>' +
-            '<button type="button" class="lex-btn" id="lex-settings">' + tr("settings") + '</button>' +
-          '</div>' +
-          '<div class="lex-banner" id="lex-banner" hidden>' + tr("voiceUnsupported") + '</div>' +
+          '<div class="lex-hint" id="lex-hint">' + tr("idle") + '</div>' +
+          '<div class="lex-jurisdiction">⚖ ' + (integrated ? 'PlantGuard knowledge · Lex voice' : tr("jurisdiction")) + '</div>' +
         '</div>' +
-        '<aside class="lex-panel">' +
-          '<div class="lex-panel-head"><span class="lex-dot" id="lex-dot"></span>' +
-            '<strong>LEX · CORE LINK</strong><span class="lex-status" id="lex-status">IDLE</span></div>' +
-          '<div class="lex-messages" id="lex-messages"><p class="lex-empty">' + tr("empty") + '</p></div>' +
-          '<div class="lex-filebar" id="lex-filebar" hidden><button type="button" class="lex-btn" id="lex-pick">📎 Upload document</button></div>' +
-          '<form class="lex-compose" id="lex-form">' +
-            '<input id="lex-input" type="text" placeholder="Ask Lex anything…" autocomplete="off" />' +
-            '<button type="submit" class="lex-send">' + tr("send") + '</button>' +
-          '</form>' +
-        '</aside>' +
-      '</div>' +
-      '<div class="lex-settings" id="lex-settings-panel" hidden></div>';
+        '<div class="lex-controls">' +
+          '<button type="button" class="lex-btn lex-btn-primary" id="lex-mic">🎙 Start listening</button>' +
+          '<button type="button" class="lex-btn" id="lex-settings">' + tr("settings") + '</button>' +
+        '</div>' +
+        '<div class="lex-banner" id="lex-banner" hidden>' + tr("voiceUnsupported") + '</div>' +
+      '</div>';
+
+    if (integrated) {
+      root.innerHTML =
+        '<div class="lex-shell lex-shell-inline">' +
+          '<div class="lex-stars">' + stars + '</div>' + head +
+          '<div class="lex-inline-body">' + core +
+            '<div class="lex-inline-note">Speak naturally and Lex will answer in this chat. Your typed messages below work exactly the same.</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="lex-settings" id="lex-settings-panel" hidden></div>';
+    } else {
+      root.innerHTML =
+        '<div class="lex-shell">' +
+          '<div class="lex-stars">' + stars + '</div>' + core +
+          '<aside class="lex-panel">' + head +
+            '<div class="lex-messages" id="lex-messages"><p class="lex-empty">' + tr("empty") + '</p></div>' +
+            '<div class="lex-filebar" id="lex-filebar" hidden><button type="button" class="lex-btn" id="lex-pick">📎 Upload document</button></div>' +
+            '<form class="lex-compose" id="lex-form">' +
+              '<input id="lex-input" type="text" placeholder="Ask Lex anything…" autocomplete="off" />' +
+              '<button type="submit" class="lex-send">' + tr("send") + '</button>' +
+            '</form>' +
+          '</aside>' +
+        '</div>' +
+        '<div class="lex-settings" id="lex-settings-panel" hidden></div>';
+    }
 
     var orb = document.getElementById("lex-orb");
     var hint = document.getElementById("lex-hint");
@@ -261,33 +275,50 @@
     function setAmplitude(v) { amplitude = Math.max(0, Math.min(1, v)); paintOrb(); }
 
     function addMessage(role, text) {
-      var empty = messages.querySelector(".lex-empty");
-      if (empty) empty.remove();
-      var el = document.createElement("div");
-      el.className = "lex-msg lex-msg-" + role;
-      el.textContent = text;
-      messages.appendChild(el);
-      messages.scrollTop = messages.scrollHeight;
+      if (messages) {
+        var empty = messages.querySelector(".lex-empty");
+        if (empty) empty.remove();
+        var el = document.createElement("div");
+        el.className = "lex-msg lex-msg-" + role;
+        el.textContent = text;
+        messages.appendChild(el);
+        messages.scrollTop = messages.scrollHeight;
+      }
       context.addTurn(role, text);
     }
 
     function respond(text) {
+      if (!text) { setState("idle"); return; }
       setState("speaking");
       speak(text, setAmplitude, function () { setState("idle"); });
     }
 
+    var LEGAL_INTENTS = {
+      ANALYZE_DOCUMENT: 1, GENERATE_DOCUMENT: 1, ASK_QUESTION: 1, IRAC_MEMO: 1,
+    };
+
     function send(transcript, explicitIntent) {
       var parsed = explicitIntent || parseIntent(transcript);
-      addMessage("user", transcript);
       setState("processing");
       context.setContext("chatting");
+
+      if (integrated && !LEGAL_INTENTS[parsed.intent] && window.lexAssistant) {
+        addMessage("user", transcript);
+        var htmlReply = window.lexAssistant.submit(transcript);
+        var spoken = window.lexAssistant.replyText(htmlReply);
+        addMessage("assistant", spoken);
+        respond(spoken);
+        return;
+      }
+
       apiCall("/api/voice", {
         transcript: transcript, intent: parsed.intent, jurisdiction: "NG",
         session_id: sessionId, context_history: context.getHistory(), language: getPreferredLanguage(),
       }).then(function (res) {
         sessionId = res.session_id || sessionId;
+        addMessage("user", transcript);
         addMessage("assistant", res.response_text || "Done.");
-        if (res.should_navigate_to === "analyze") {
+        if (res.should_navigate_to === "analyze" && filebar) {
           filebar.hidden = false;
           fileFlow = "analyze";
           respond("I'm ready to analyze a document. Please upload a file or take a photo.");
@@ -306,7 +337,7 @@
     if (!SR) document.getElementById("lex-banner").hidden = false;
 
     function startMic() {
-      if (!SR) { input.focus(); return; }
+      if (!SR) { (input || document.getElementById("chat-input") || document.body).focus(); return; }
       if (recognition) { stopMic(); return; }
       recognition = new SR();
       recognition.lang = LANGUAGE_TO_LOCALE[getPreferredLanguage()] || "en-GB";
@@ -362,29 +393,35 @@
     }
 
     document.getElementById("lex-mic").addEventListener("click", startMic);
-    document.getElementById("lex-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      var v = input.value.trim(); if (!v) return;
-      input.value = ""; send(v);
-    });
+    var form = document.getElementById("lex-form");
+    if (form) {
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var v = input.value.trim(); if (!v) return;
+        input.value = ""; send(v);
+      });
+    }
 
-    document.getElementById("lex-pick").addEventListener("click", function () {
-      var picker = document.createElement("input");
-      picker.type = "file"; picker.accept = ".pdf,.txt,.docx,image/*";
-      picker.onchange = function () {
-        var file = picker.files && picker.files[0]; if (!file) return;
-        addMessage("user", "Uploaded " + file.name);
-        setState("processing");
-        apiCall("/api/analyze", { file_name: file.name, jurisdiction: "NG" }).then(function (res) {
-          addMessage("assistant", "Your " + (res.document_type || "document") + " has a "
-            + (res.risk_level || "MEDIUM") + " risk score of " + (res.risk_score || 0)
-            + " out of 100. " + (res.verdict_reason || ""));
-          filebar.hidden = true;
-          respond(res.verdict_reason || "Analysis complete.");
-        });
-      };
-      picker.click();
-    });
+    var pick = document.getElementById("lex-pick");
+    if (pick) {
+      pick.addEventListener("click", function () {
+        var picker = document.createElement("input");
+        picker.type = "file"; picker.accept = ".pdf,.txt,.docx,image/*";
+        picker.onchange = function () {
+          var file = picker.files && picker.files[0]; if (!file) return;
+          addMessage("user", "Uploaded " + file.name);
+          setState("processing");
+          apiCall("/api/analyze", { file_name: file.name, jurisdiction: "NG" }).then(function (res) {
+            addMessage("assistant", "Your " + (res.document_type || "document") + " has a "
+              + (res.risk_level || "MEDIUM") + " risk score of " + (res.risk_score || 0)
+              + " out of 100. " + (res.verdict_reason || ""));
+            filebar.hidden = true;
+            respond(res.verdict_reason || "Analysis complete.");
+          });
+        };
+        picker.click();
+      });
+    }
 
     /* settings panel */
     var panel = document.getElementById("lex-settings-panel");

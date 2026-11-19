@@ -19,7 +19,7 @@ The app runs as a static site: neural inference, search, and the assistant run c
 - **3D experience:** Clearly visible 3D hero depth/motion, depth-styled surfaces, **realistic 3D hover/tilt effects** on cards (including encyclopedia results), and a **3D phone-like spin animation** when encyclopedia results update from search/filter (respects `prefers-reduced-motion`).
 - **Assistant:** Built-in local assistant that can explain the latest diagnosis, interpret available weather context, and answer questions from the encyclopedia/app context.
 - **Chamomile Botanical Guide:** Integrated informational section (origin & habitat, varieties, classic records, brewing methods, dosage & cautions, products & processing, and presentation grades) in the Natura Care style.
-- **Lex · Core Link:** DocuSense Africa v2 voice companion built directly into PlantGuard from the 15 build prompts — animated colour-themed orb, wake word detection, Web Speech STT/TTS, intent parsing, settings for companion name/colour/voice/language, and analysis/document command flows.
+- **Assistant + Lex Core:** The DocuSense Africa v2 voice companion is mounted inside the existing AI Assistant — animated colour-themed orb, wake word detection, Web Speech STT/TTS, and spoken replies using the same chat. Settings cover companion name/colour/voice/language, and legal intents still route to the DocuSense API.
 - **Design & accessibility:** Wide, dynamic chamomile palette (green-forward), **light/dark mode** with sun/moon toggle and saved preference, responsive layout, and motion/accessibility considerations.
 
 ## Project structure
