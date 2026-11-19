@@ -7,6 +7,7 @@
   <meta name="theme-color" content="#24452f" />
   <title>PlantGuard — Intelligent Plant & Farm Knowledge Network</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="docusense/frontend/lex.css" />
 </head>
 <body>
   <header class="topbar">
@@ -28,6 +29,7 @@
       <a href="#weather" class="nav-link" data-section="weather">Weather Insights</a>
       <a href="#encyclopedia" class="nav-link" data-section="encyclopedia">Encyclopedia</a>
       <a href="#assistant" class="nav-link" data-section="assistant">Assistant</a>
+      <a href="#lex" class="nav-link" data-section="lex">Lex · Core Link</a>
       <a href="#chamomile" class="nav-link" data-section="chamomile">Chamomile Guide</a>
       <a href="#help" class="nav-link" data-section="help">Guide</a>
       <div class="sidebar-note">Forest-green intelligence for crops, weeds, and special plants.</div>
@@ -265,6 +267,15 @@
         </div>
       </section>
 
+      <!-- LEX · DOCUSENSE -->
+      <section id="lex" class="section">
+        <div class="section-head reveal">
+          <h1>Lex · Core Link</h1>
+          <p class="lead">Your AI legal companion — wake word, voice commands and document analysis, built from the DocuSense prompts.</p>
+        </div>
+        <div id="lex-root" class="reveal"></div>
+      </section>
+
       <!-- HELP -->
       <section id="help" class="section">
         <div class="section-head reveal">
@@ -303,6 +314,7 @@
     </div>
   </noscript>
   <script src="knowledge.js"></script>
+  <script src="docusense/frontend/lex.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

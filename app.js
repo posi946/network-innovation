@@ -689,6 +689,7 @@ function setup() {
   });
 
   initAssistant();
+  if (typeof window.initLex === "function") window.initLex();
   initRevealAnimations();
   init3DEffects();
 

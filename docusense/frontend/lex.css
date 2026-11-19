@@ -1,0 +1,97 @@
+/* DocuSense Lex — integrated into PlantGuard (Days 11–15). */
+#lex-root { color: #e7f0df; }
+.lex-shell {
+  position: relative; display: grid; grid-template-columns: minmax(0, 3fr) minmax(340px, 2fr);
+  gap: 2rem; min-height: 640px; background: #080514; border: 1px solid #2a2440;
+  border-radius: 18px; overflow: hidden; padding: 2.4rem;
+  font-family: Inter, system-ui, Arial, sans-serif;
+}
+.lex-stars { position: absolute; inset: 0; pointer-events: none; }
+.lex-stars i { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #fff; animation: lexTwinkle 3.6s infinite ease-in-out; }
+@keyframes lexTwinkle { 0%, 100% { opacity: .15; } 50% { opacity: .9; } }
+.lex-main { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.2rem; }
+.lex-orb-wrap { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.lex-orb {
+  --ring1: rgba(124,77,255,.35); --ring2: rgba(0,188,212,.25); --glow: rgba(124,77,255,.5); --amp: 0;
+  position: relative; width: 320px; height: 320px; border-radius: 50%;
+  display: grid; place-items: center; transition: filter .3s;
+  filter: saturate(calc(1 + var(--amp) * .8)) brightness(calc(.8 + var(--amp) * .5));
+}
+.lex-core {
+  position: absolute; width: 210px; height: 210px; border-radius: 50%;
+  background: radial-gradient(circle at 36% 32%, var(--glow), var(--ring1) 42%, rgba(8,5,20,.9) 78%);
+  box-shadow: 0 0 calc(30px + var(--amp) * 70px) var(--glow),
+              inset 0 0 calc(20px + var(--amp) * 40px) var(--ring2);
+  transform: scale(calc(1 + var(--amp) * .09));
+  transition: transform .08s linear, box-shadow .08s linear;
+}
+.lex-ring { position: absolute; border-radius: 50%; border: 2px solid var(--ring1); opacity: .65; }
+.lex-ring-1 { inset: 18px; animation: lexSpin 14s linear infinite; border-style: dashed; }
+.lex-ring-2 { inset: 4px; border-color: var(--ring2); animation: lexSpin 9s linear infinite reverse; }
+.lex-ring-3 { inset: 44px; border-color: var(--glow); opacity: .35; animation: lexSpin 6s linear infinite; }
+@keyframes lexSpin { to { transform: rotate(360deg); } }
+.lex-scan {
+  position: absolute; left: 22%; right: 22%; height: 2px; top: 30%;
+  background: linear-gradient(90deg, transparent, var(--ring2), #fff, var(--ring1), transparent);
+  box-shadow: 0 0 12px var(--ring2); animation: lexScan 2.8s ease-in-out infinite;
+}
+@keyframes lexScan { 0%, 100% { top: 24%; opacity: .4; } 50% { top: 76%; opacity: 1; } }
+.lex-corona { position: absolute; inset: -22px; border-radius: 50%; box-shadow: 0 0 60px var(--ring2); opacity: 0; transition: opacity .3s; }
+.lex-orb[data-state="listening"] .lex-corona { opacity: .8; }
+.lex-orb[data-state="listening"] .lex-ring-2 { animation-duration: 2.6s; }
+.lex-orb[data-state="listening"] .lex-scan { animation-duration: 1s; }
+.lex-orb[data-state="speaking"] { filter: brightness(1.25) saturate(1.5); }
+.lex-orb[data-state="processing"] .lex-ring-3 { animation-duration: 1.4s; }
+.lex-hint { font-size: 1.05rem; letter-spacing: .02em; color: #d8e6cf; }
+.lex-jurisdiction, .lex-note { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem; color: #9fb59c; }
+.lex-controls { display: flex; gap: .8rem; flex-wrap: wrap; justify-content: center; }
+.lex-btn {
+  background: rgba(255,255,255,.06); color: #e7f0df; border: 1px solid #3a3552;
+  border-radius: 999px; padding: .7rem 1.15rem; font: inherit; font-size: .85rem; cursor: pointer;
+}
+.lex-btn:hover { background: rgba(255,255,255,.12); }
+.lex-btn-primary { background: linear-gradient(135deg, #7c4dff, #00bcd4); border-color: transparent; color: #fff; font-weight: 700; }
+.lex-banner { background: rgba(228,200,79,.12); border: 1px solid rgba(228,200,79,.4); color: #f0e4b0; padding: .7rem 1rem; border-radius: 10px; font-size: .8rem; max-width: 420px; text-align: center; }
+.lex-panel {
+  position: relative; display: flex; flex-direction: column; min-height: 560px;
+  background: #0a0614; border: 1px solid #2a2440; border-radius: 16px; overflow: hidden;
+}
+.lex-panel-head { display: flex; align-items: center; gap: .6rem; padding: 1rem 1.2rem; border-bottom: 1px solid #2a2440; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem; }
+.lex-dot { width: 9px; height: 9px; border-radius: 50%; background: #53607a; }
+.lex-dot-listening { background: #00e5ff; box-shadow: 0 0 10px #00e5ff; }
+.lex-dot-speaking { background: #e4c84f; box-shadow: 0 0 10px #e4c84f; animation: lexPulse 1s infinite; }
+.lex-dot-processing { background: #c9a84c; }
+@keyframes lexPulse { 50% { opacity: .4; } }
+.lex-status { margin-left: auto; font-size: .65rem; letter-spacing: .12em; color: #8ea08a; }
+.lex-messages { flex: 1; overflow-y: auto; padding: 1.2rem; display: flex; flex-direction: column; gap: .8rem; }
+.lex-empty { color: #9fb59c; font-family: Georgia, serif; font-size: 1.05rem; line-height: 1.5; }
+.lex-msg { max-width: 88%; padding: .75rem 1rem; border-radius: 14px; line-height: 1.45; font-size: .9rem; }
+.lex-msg-user { align-self: flex-end; background: rgba(124,77,255,.22); border: 1px solid rgba(124,77,255,.35); }
+.lex-msg-assistant { align-self: flex-start; background: #12102a; border: 1px solid #2a2440; font-family: Georgia, serif; }
+.lex-filebar { padding: 0 1rem .8rem; }
+.lex-compose { display: flex; gap: .6rem; padding: 1rem; border-top: 1px solid #2a2440; }
+.lex-compose input { flex: 1; background: #12102a; border: 1px solid #3a3552; color: #e7f0df; border-radius: 10px; padding: .75rem 1rem; font: inherit; }
+.lex-compose input:focus { outline: none; border-color: #7c4dff; }
+.lex-send { background: #e4c84f; color: #162419; border: 0; border-radius: 10px; padding: .7rem 1.1rem; font-weight: 800; cursor: pointer; }
+.lex-settings { position: absolute; inset: 0; z-index: 5; background: rgba(8,5,20,.96); padding: 2rem; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; align-content: start; }
+.lex-set-card { background: #12102a; border: 1px solid #2a2440; border-radius: 14px; padding: 1.2rem; }
+.lex-set-card h3 { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem; text-transform: uppercase; letter-spacing: .1em; color: #e4c84f; margin-bottom: .9rem; }
+.lex-set-card input[type="text"], .lex-set-card input:not([type]) { width: 100%; background: #080514; border: 1px solid #3a3552; color: #fff; padding: .65rem .8rem; border-radius: 8px; }
+.lex-chips, .lex-swatches, .lex-voices { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .7rem; }
+.lex-chips button, .lex-voices button { background: #1a1733; color: #cfd9c7; border: 1px solid #3a3552; border-radius: 8px; padding: .45rem .7rem; cursor: pointer; font-size: .78rem; }
+.lex-chips button.selected, .lex-voices button.selected { border-color: #e4c84f; color: #e4c84f; }
+.lex-swatch { width: 34px; height: 34px; border-radius: 50%; border: 2px solid transparent; background: var(--sw); cursor: pointer; }
+.lex-swatch.selected { border-color: #e4c84f; box-shadow: 0 0 0 2px #080514, 0 0 0 4px #e4c84f; }
+.lex-voices button { display: grid; grid-template-columns: 1fr auto; gap: .1rem .5rem; text-align: left; }
+.lex-voices small { grid-column: 1; color: #8ea08a; font-size: .65rem; }
+.lex-voices span { grid-row: 1 / 3; grid-column: 2; align-self: center; color: #e4c84f; }
+#lex-save { justify-self: start; }
+@media (max-width: 900px) {
+  .lex-shell { grid-template-columns: 1fr; padding: 1.2rem; }
+  .lex-orb { width: 250px; height: 250px; }
+  .lex-core { width: 165px; height: 165px; }
+  .lex-panel { min-height: 420px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lex-ring, .lex-scan, .lex-stars i, .lex-dot { animation: none !important; }
+}

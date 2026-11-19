@@ -1,0 +1,45 @@
+name: DocuSense backend
+
+on:
+  push:
+    branches: [main]
+    paths: ['docusense/backend/**']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docusense/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: pytest --tb=short -q
+
+  security:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docusense/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pip-audit
+      - run: pip-audit --fail-on-severity high -r requirements.txt
+
+  deploy:
+    needs: [test, security]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Railway deploy
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          npm i -g @railway/cli
+          railway up --service docusense-api
