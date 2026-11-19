@@ -12,7 +12,7 @@ Pillow==11.1.0
 pgvector==0.3.6
 SQLAlchemy==2.0.36
 psycopg2-binary==2.9.10
-slowapi==0.1.9
+slowapi==0.1.10
 posthog==3.20.0
 sentry-sdk[fastapi]==2.20.0
 python-magic==0.4.27
