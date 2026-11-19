@@ -660,52 +660,6 @@ function initTheme() {
   }
 }
 
-function initBuildPlan() {
-  const plan = document.getElementById("build-plan");
-  if (!plan || plan.dataset.bpInit === "1") return;
-  plan.dataset.bpInit = "1";
-
-  plan.querySelectorAll("[data-bp-jump]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const target = document.getElementById(btn.dataset.bpJump);
-      if (target) target.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
-    });
-  });
-
-  plan.querySelectorAll("[data-bp-copy]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const el = document.getElementById(btn.dataset.bpCopy);
-      if (!el) return;
-      const text = el.innerText;
-      let copied = false;
-      try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(text);
-          copied = true;
-        }
-      } catch (e) { /* fall through to legacy copy */ }
-      if (!copied) {
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        ta.style.position = "fixed";
-        ta.style.opacity = "0";
-        document.body.appendChild(ta);
-        ta.select();
-        try { copied = document.execCommand("copy"); } catch (e) { /* no-op */ }
-        document.body.removeChild(ta);
-      }
-      if (!copied) return;
-      const original = btn.textContent;
-      btn.textContent = "Copied";
-      btn.classList.add("bp-copied");
-      window.setTimeout(() => {
-        btn.textContent = original;
-        btn.classList.remove("bp-copied");
-      }, 1500);
-    });
-  });
-}
-
 function setup() {
   initTheme();
   document.querySelectorAll(".nav-link").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); showSection(a.dataset.section); }));
@@ -735,7 +689,6 @@ function setup() {
   });
 
   initAssistant();
-  initBuildPlan();
   initRevealAnimations();
   init3DEffects();
 
